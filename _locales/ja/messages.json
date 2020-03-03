@@ -4,6 +4,13 @@
 
   "command_toggleLockCollapsed":   { "message": "折りたたみ状態のロックの切り替え" },
   "context_lockCollapsed_label": { "message": "たたんだ状態でロック(&K)" },
-  "config_autoExpandOnCollapsedChildActiveUnderLockedCollapsed_label": { "message": "折りたたんだ状態でロックされたツリーの配下のタブである場合もツリーを展開する" },
-  "config_treeDoubleClickBehavior_toggleLockCollapsed": { "message": "ツリーの折りたたみ状態のロックの切り替え" }
+
+  "config_context_lockCollapsed_label": { "message": "コンテキストメニューに「たたんだ状態でロック」を追加" },
+  "config_toggleByDblClick_label": { "message": "タブのダブルクリックでツリーの折りたたみ状態のロックを切り替ええる" },
+
+  "config_blockExpansion_caption": { "message": "折りたたんだ状態でロックされたツリーは以下の場面で自動展開しない" },
+  "config_blockExpansionFromFocusedParent_label":       { "message": "親タブがフォーカスされたとき" },
+  "config_blockExpansionFromFocusedCollapsedTab_label": { "message": "折りたたまれた子孫タブがフォーカスされたとき" },
+  "config_blockExpansionFromLongPressCtrlKey_label":    { "message": "Ctrlキーを長押ししたとき" },
+  "config_blockExpansionFromEndTabSwitch_label":        { "message": "Ctrl-Tab/Ctrl-Shift-Tabでのタブ切り替えが完了したとき" }
 }

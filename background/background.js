@@ -5,6 +5,10 @@
 */
 'use strict';
 
+import {
+  configs
+} from '/common/common.js';
+
 const TST_ID = 'treestyletab@piro.sakura.ne.jp';
 
 const KEY_LOCKED_COLLAPSED = 'tst-lock-tree-collapsed-locked-collapsed';
@@ -60,13 +64,26 @@ browser.runtime.onMessageExternal.addListener((message, sender) => {
           break;
 
         case 'try-expand-tree-from-focused-parent':
+          if (configs.blockExpansionFromFocusedParent &&
+              lockedTabs.has(message.tab.id))
+            return Promise.resolve(true);
+          break;
+
         case 'try-expand-tree-from-long-press-ctrl-key':
+          if (configs.blockExpansionFromLongPressCtrlKey &&
+              lockedTabs.has(message.tab.id))
+            return Promise.resolve(true);
+          break;
+
         case 'try-expand-tree-from-end-tab-switch':
-          if (lockedTabs.has(message.tab.id))
+          if (configs.blockExpansionFromEndTabSwitch &&
+              lockedTabs.has(message.tab.id))
             return Promise.resolve(true);
           break;
 
         case 'try-expand-tree-from-focused-collapsed-tab':
+          if (!configs.blockExpansionFromFocusedCollapsedTab)
+            return;
           return (async () => {
             const lockedCollapsedAncestors = await browser.runtime.sendMessage(TST_ID, {
               type: 'get-tree',
@@ -90,7 +107,8 @@ browser.runtime.onMessageExternal.addListener((message, sender) => {
               message.altKey ||
               message.ctrlKey ||
               message.metaKey ||
-              message.shiftKey)
+              message.shiftKey ||
+              !configs.toggleByDblClick)
             return;
           toggleTabLocked(message.tab.id);
           /*

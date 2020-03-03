@@ -4,6 +4,13 @@
 
   "command_toggleLockCollapsed":   { "message": "Toggle Locking of Collapsed" },
   "context_lockCollapsed_label": { "message": "Loc&k as Collapsed" },
-  "config_autoExpandOnCollapsedChildActiveUnderLockedCollapsed_label": { "message": "even if it is under a \"Locked as Collapsed\" tree" },
-  "config_treeDoubleClickBehavior_toggleLockCollapsed": { "message": "Toggle Locking of Collapsed" }
+
+  "config_context_lockCollapsed_label": { "message": "Show \"Lock as Collapsed\" extra tab context menu command" },
+  "config_toggleByDblClick_label": { "message": "Toggle locking of a tree by double click" },
+
+  "config_blockExpansion_caption": { "message": "Don't expand tree automatically when" },
+  "config_blockExpansionFromFocusedParent_label":       { "message": "a Parent Tab gets focused" },
+  "config_blockExpansionFromFocusedCollapsedTab_label": { "message": "a Collapsed (invisible) Tab gets focused" },
+  "config_blockExpansionFromLongPressCtrlKey_label":    { "message": "Long-Press of the Ctrl key" },
+  "config_blockExpansionFromEndTabSwitch_label":        { "message": "After tab switch with Ctrl-Tab or Ctrl-Shift-Tab" }
 }
