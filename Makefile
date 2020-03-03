@@ -20,7 +20,7 @@ format: install_dependency
 
 xpi: update_extlib install_extlib lint
 	rm -f ./*.xpi
-	zip -r -9 tst-lock-tree-collapsed.xpi manifest.json _locales background resources -x '*/.*' >/dev/null 2>/dev/null
+	zip -r -9 tst-lock-tree-collapsed.xpi manifest.json _locales extlib common background options resources -x '*/.*' >/dev/null 2>/dev/null
 
 update_extlib:
 	git submodule update --init
