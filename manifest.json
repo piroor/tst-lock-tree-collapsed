@@ -6,7 +6,8 @@
   "description": "__MSG_extensionDescription__",
   "permissions": [
     "tabs",
-    "sessions"
+    "sessions",
+    "storage"
   ],
   "background": {
     "page": "/background/background.html"
