@@ -21,6 +21,8 @@ async function registerToTST() {
       listeningTypes: [
         'sidebar-show',
         'try-expand-tree-from-focused-parent',
+        'try-expand-tree-from-long-press-ctrl-key',
+        'try-expand-tree-from-end-tab-switch',
         'try-expand-tree-from-focused-collapsed-tab',
         'tab-dblclicked'
       ],
@@ -58,6 +60,8 @@ browser.runtime.onMessageExternal.addListener((message, sender) => {
           break;
 
         case 'try-expand-tree-from-focused-parent':
+        case 'try-expand-tree-from-long-press-ctrl-key':
+        case 'try-expand-tree-from-end-tab-switch':
           if (lockedTabs.has(message.tab.id))
             return Promise.resolve(true);
           break;
@@ -89,6 +93,14 @@ browser.runtime.onMessageExternal.addListener((message, sender) => {
               message.shiftKey)
             return;
           toggleTabLocked(message.tab.id);
+          /*
+          if (lockedTabs.has(message.tab.id)) {
+            browser.runtime.sendMessage(TST_ID, {
+              type: 'collapse-tree',
+              tab:  message.tab.id
+            });
+          }
+          */
           return Promise.resolve(true);
       }
       break;
