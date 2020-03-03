@@ -202,8 +202,9 @@ async function onMenuShown(info, tab) {
     menuItemDefinition.checked = checked;
   }
   if (Object.keys(updateParams).length > 0) {
-    browser.menus.update(menuItemDefinition.id, updateParams);
-    browser.menus.refresh();
+    browser.menus.update(menuItemDefinition.id, updateParams).then(() => {
+      browser.menus.refresh();
+    });
     browser.runtime.sendMessage(TST_ID, {
       type:   'fake-contextMenu-update',
       params: [menuItemDefinition.id, updateParams]
