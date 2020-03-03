@@ -15,6 +15,16 @@ const KEY_LOCKED_COLLAPSED = 'tst-lock-tree-collapsed-locked-collapsed';
 
 const lockedTabs = new Set();
 
+const menuItemDefinition = {
+  id:       'locked-collapsed',
+  type:     'checkbox',
+  checked:  false,
+  title:    browser.i18n.getMessage('context_lockCollapsed_label'),
+  contexts: ['tab'],
+  visible:  true
+};
+browser.menus.create(menuItemDefinition);
+
 async function registerToTST() {
   try {
     const base = `moz-extension://${location.host}`;
@@ -29,7 +39,8 @@ async function registerToTST() {
         'try-expand-tree-from-long-press-ctrl-key',
         'try-expand-tree-from-end-tab-switch',
         'try-expand-tree-from-focused-collapsed-tab',
-        'tab-dblclicked'
+        'tab-dblclicked',
+        'fake-contextMenu-shown'
       ],
       style: `
         tab-item:not(.collapsed).${KEY_LOCKED_COLLAPSED} tab-twisty::before {
@@ -40,6 +51,10 @@ async function registerToTST() {
           mask: url("${base}/resources/ArrowheadDownDouble.svg") no-repeat center / 60%;
         }
       `
+    });
+    browser.runtime.sendMessage(TST_ID, {
+      type:   'fake-contextMenu-create',
+      params: menuItemDefinition
     });
   }
   catch(_error) {
@@ -154,6 +169,14 @@ browser.runtime.onMessageExternal.addListener((message, sender) => {
             */
             return true;
           })();
+
+        case 'fake-contextMenu-shown':
+          onMenuShown(message.info, message.tab);
+          break;
+
+        case 'fake-contextMenu-click':
+          onMenuClicked(message.info, message.tab);
+          break;
       }
       break;
   }
@@ -166,6 +189,43 @@ browser.tabs.onCreated.addListener(tab => {
 browser.tabs.onRemoved.addListener(tabId => {
   lockedTabs.delete(tabId);
 });
+
+async function onMenuShown(info, tab) {
+  const updateParams = {};
+  if (configs.context_lockCollapsed != menuItemDefinition.visible) {
+    updateParams.visible = configs.context_lockCollapsed;
+    menuItemDefinition.visible = updateParams.visible;
+  }
+  const checked = tab && lockedTabs.has(tab.id);
+  if (checked != menuItemDefinition.checked) {
+    updateParams.checked = checked;
+    menuItemDefinition.checked = checked;
+  }
+  if (Object.keys(updateParams).length > 0) {
+    browser.menus.update(menuItemDefinition.id, updateParams);
+    browser.menus.refresh();
+    browser.runtime.sendMessage(TST_ID, {
+      type:   'fake-contextMenu-update',
+      params: [menuItemDefinition.id, updateParams]
+    });
+  }
+}
+browser.menus.onShown.addListener(onMenuShown);
+
+function onMenuClicked(info, tab) {
+  switch(info.menuItemId) {
+    case menuItemDefinition.id:
+      if (tab) {
+        if (!lockedTabs.has(tab.id))
+          lockTab(tab.id);
+        else
+          unlockTab(tab.id);
+      }
+      break;
+  }
+}
+browser.menus.onClicked.addListener(onMenuClicked);
+
 
 async function restoreLockedState(id) {
   let locked = await browser.sessions.getTabValue(id, KEY_LOCKED_COLLAPSED);
