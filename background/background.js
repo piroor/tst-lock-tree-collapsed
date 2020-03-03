@@ -92,6 +92,10 @@ browser.runtime.onMessageExternal.addListener((message, sender) => {
           if (!configs.blockExpansionFromFocusedCollapsedTab)
             return;
           return (async () => {
+            await new Promise(resolve => setTimeout(resolve, 150));
+            const tab = await browser.tabs.get(message.tab.id);
+            if (!tab || tab.active)
+              return;
             const lockedCollapsedAncestors = await browser.runtime.sendMessage(TST_ID, {
               type: 'get-tree',
               tabs:  message.tab.ancestorTabIds.filter(id => lockedTabs.has(id))
