@@ -193,12 +193,12 @@ browser.tabs.onRemoved.addListener(tabId => {
 async function onMenuShown(info, tab) {
   const updateParams = {};
   if (configs.context_lockCollapsed != menuItemDefinition.visible) {
-    updateParams.visible = configs.context_lockCollapsed;
+    updateParams.visible       = configs.context_lockCollapsed;
     menuItemDefinition.visible = updateParams.visible;
   }
   const checked = tab && lockedTabs.has(tab.id);
   if (checked != menuItemDefinition.checked) {
-    updateParams.checked = checked;
+    updateParams.checked       = checked;
     menuItemDefinition.checked = checked;
   }
   if (Object.keys(updateParams).length > 0) {
