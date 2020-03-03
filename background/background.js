@@ -213,10 +213,13 @@ async function onMenuShown(info, tab) {
 }
 browser.menus.onShown.addListener(onMenuShown);
 
-function onMenuClicked(info, tab) {
+async function onMenuClicked(info, tab) {
   switch(info.menuItemId) {
     case menuItemDefinition.id:
-      if (tab) {
+      if (!tab)
+        return;
+      const tabs = await getMultiselectedTabs(tab);
+      for (const tab of tabs) {
         if (!lockedTabs.has(tab.id))
           lockTab(tab.id);
         else
@@ -227,6 +230,17 @@ function onMenuClicked(info, tab) {
 }
 browser.menus.onClicked.addListener(onMenuClicked);
 
+export async function getMultiselectedTabs(tab) {
+  if (!tab)
+    return [];
+  if (tab.highlighted)
+    return browser.tabs.query({
+      windowId:    tab.windowId,
+      highlighted: true
+    });
+  else
+    return [tab];
+}
 
 async function restoreLockedState(id) {
   let locked = await browser.sessions.getTabValue(id, KEY_LOCKED_COLLAPSED);
