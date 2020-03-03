@@ -11,6 +11,14 @@
   "background": {
     "page": "/background/background.html"
   },
+  "commands": {
+    "toggleLockCollapsed": {
+      "description": "__MSG_command_toggleLockCollapsed__"
+    }
+  },
+  "options_ui": {
+    "page": "/options/options.html"
+  },
   "web_accessible_resources": [
     "/resources/ArrowheadDownDouble.svg"
   ],
