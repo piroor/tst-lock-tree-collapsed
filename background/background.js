@@ -95,7 +95,7 @@ browser.runtime.onMessageExternal.addListener((message, sender) => {
             if (nearestLockedCollapsedAncestor) {
               setTimeout(() => {
                 // immediate refocus may cause unhighlighted active tab on TS...
-              browser.tabs.update(nearestLockedCollapsedAncestor.id, { active: true });
+                browser.tabs.update(nearestLockedCollapsedAncestor.id, { active: true });
               }, 150);
               return true;
             }
