@@ -20,4 +20,4 @@ format: install_dependency
 
 xpi: lint
 	rm -f ./*.xpi
-	zip -r -9 tst-lock-tree-collapsed.xpi manifest.json _locales background -x '*/.*' >/dev/null 2>/dev/null
+	zip -r -9 tst-lock-tree-collapsed.xpi manifest.json _locales background resources -x '*/.*' >/dev/null 2>/dev/null

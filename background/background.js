@@ -13,6 +13,7 @@ const lockedTabs = new Set();
 
 async function registerToTST() {
   try {
+    const base = `moz-extension://${location.host}`;
     await browser.runtime.sendMessage(TST_ID, {
       type: 'register-self',
       name: browser.i18n.getMessage('extensionName'),
@@ -24,7 +25,12 @@ async function registerToTST() {
         'tab-dblclicked'
       ],
       style: `
-        tab-item.${KEY_LOCKED_COLLAPSED} {
+        tab-item:not(.collapsed).${KEY_LOCKED_COLLAPSED} tab-twisty::before {
+          background: url("${base}/resources/ArrowheadDownDouble.svg") no-repeat center / 60%;
+        }
+        :root.simulate-svg-context-fill tab-item:not(.collapsed).${KEY_LOCKED_COLLAPSED} tab-twisty::before {
+          background: var(--tab-text);
+          mask: url("${base}/resources/ArrowheadDownDouble.svg") no-repeat center / 60%;
         }
       `
     });

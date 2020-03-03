@@ -11,6 +11,9 @@
   "background": {
     "page": "/background/background.html"
   },
+  "web_accessible_resources": [
+    "/resources/ArrowheadDownDouble.svg"
+  ],
   "default_locale": "en",
   "applications": {
     "gecko": {
