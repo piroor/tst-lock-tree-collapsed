@@ -48,6 +48,8 @@ async function registerToTST() {
 }
 registerToTST();
 
+let lastRedirectedParent;
+
 browser.runtime.onMessageExternal.addListener((message, sender) => {
   switch (sender.id) {
     case TST_ID:
@@ -65,7 +67,8 @@ browser.runtime.onMessageExternal.addListener((message, sender) => {
           break;
 
         case 'try-expand-tree-from-focused-parent':
-          if (configs.blockExpansionFromFocusedParent &&
+          if ((configs.blockExpansionFromFocusedParent ||
+               lastRedirectedParent == message.tab.id) &&
               lockedTabs.has(message.tab.id))
             return Promise.resolve(true);
           break;
@@ -92,10 +95,6 @@ browser.runtime.onMessageExternal.addListener((message, sender) => {
           if (!configs.blockExpansionFromFocusedCollapsedTab)
             return;
           return (async () => {
-            await new Promise(resolve => setTimeout(resolve, 150));
-            const tab = await browser.tabs.get(message.tab.id);
-            if (!tab || tab.active)
-              return;
             const lockedCollapsedAncestors = await browser.runtime.sendMessage(TST_ID, {
               type: 'get-tree',
               tabs:  message.tab.ancestorTabIds.filter(id => lockedTabs.has(id))
@@ -104,9 +103,22 @@ browser.runtime.onMessageExternal.addListener((message, sender) => {
               tab => tab.states.includes('subtree-collapsed') && lockedTabs.has(tab.id)
             );
             if (nearestLockedCollapsedAncestor) {
-              setTimeout(() => {
+              setTimeout(async () => {
+                try {
+                  const willCancel = await browser.runtime.sendMessage('tst-active-tab-in-collapsed-tree@piro.sakura.ne.jp', {
+                    type: 'will-cancel-expansion-from-focused-collapsed-tab'
+                  });
+                  if (willCancel)
+                    return;
+                }
+                catch(e) {
+                }
+                lastRedirectedParent = nearestLockedCollapsedAncestor.id;
                 // immediate refocus may cause unhighlighted active tab on TS...
                 browser.tabs.update(nearestLockedCollapsedAncestor.id, { active: true });
+                setTimeout(() => {
+                  lastRedirectedParent = null;
+                }, 250);
               }, 150);
               return true;
             }
