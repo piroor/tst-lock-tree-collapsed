@@ -110,16 +110,24 @@ browser.runtime.onMessageExternal.addListener((message, sender) => {
               message.shiftKey ||
               !configs.toggleByDblClick)
             return;
-          toggleTabLocked(message.tab.id);
-          /*
-          if (lockedTabs.has(message.tab.id)) {
-            browser.runtime.sendMessage(TST_ID, {
-              type: 'collapse-tree',
+          return (async () => {
+            const tab = await browser.runtime.sendMessage(TST_ID, {
+              type: 'get-tree',
               tab:  message.tab.id
             });
-          }
-          */
-          return Promise.resolve(true);
+            if (tab.children.length == 0)
+              return false;
+            toggleTabLocked(tab.id);
+            /*
+            if (lockedTabs.has(tab.id)) {
+              browser.runtime.sendMessage(TST_ID, {
+                type: 'collapse-tree',
+                tab:  tab.id
+              });
+            }
+            */
+            return true;
+          })();
       }
       break;
   }
