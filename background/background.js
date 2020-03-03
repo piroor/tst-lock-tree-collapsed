@@ -219,11 +219,12 @@ async function onMenuClicked(info, tab) {
       if (!tab)
         return;
       const tabs = await getMultiselectedTabs(tab);
+      const locked = lockedTabs.has(tabs[0].id);
       for (const tab of tabs) {
-        if (!lockedTabs.has(tab.id))
-          lockTab(tab.id);
-        else
+        if (locked)
           unlockTab(tab.id);
+        else
+          lockTab(tab.id);
       }
       break;
   }
@@ -241,6 +242,26 @@ export async function getMultiselectedTabs(tab) {
   else
     return [tab];
 }
+
+browser.commands.onCommand.addListener(async command => {
+  const activeTabs = await browser.tabs.query({
+    active:        true,
+    currentWindow: true
+  });
+  const miltiselectedTabs = await getMultiselectedTabs(activeTabs[0]);
+  switch (command) {
+    case 'toggleLockCollapsed':
+      const locked = lockedTabs.has(activeTabs[0].id);
+      for (const tab of miltiselectedTabs) {
+        if (locked)
+          unlockTab(tab.id);
+        else
+          lockTab(tab.id);
+      }
+      return;
+  }
+});
+
 
 async function restoreLockedState(id) {
   let locked = await browser.sessions.getTabValue(id, KEY_LOCKED_COLLAPSED);
