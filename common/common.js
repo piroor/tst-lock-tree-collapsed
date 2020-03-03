@@ -11,6 +11,7 @@ export const configs = new Configs({
   context_lockCollapsed: true,
 
   toggleByDblClick: true,
+  lockByDefault: false,
   blockExpansionFromFocusedParent:        true,
   blockExpansionFromFocusedBundledParent: true,
   blockExpansionFromLongPressCtrlKey:     true,

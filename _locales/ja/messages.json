@@ -6,7 +6,8 @@
   "context_lockCollapsed_label": { "message": "たたんだ状態でロック(&K)" },
 
   "config_context_lockCollapsed_label": { "message": "コンテキストメニューに「たたんだ状態でロック」を追加" },
-  "config_toggleByDblClick_label": { "message": "タブのダブルクリックでツリーの折りたたみ状態のロックを切り替ええる" },
+  "config_toggleByDblClick_label": { "message": "タブのダブルクリックでツリーの折りたたみ状態のロックを切り替える" },
+  "config_lockByDefault_label": { "message": "初期状態でロックする" },
 
   "config_blockExpansion_caption": { "message": "折りたたんだ状態でロックされたツリーは以下の場面で自動展開しない" },
   "config_blockExpansionFromFocusedParent_label":       { "message": "親タブがフォーカスされたとき" },

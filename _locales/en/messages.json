@@ -7,6 +7,7 @@
 
   "config_context_lockCollapsed_label": { "message": "Show \"Lock as Collapsed\" extra tab context menu command" },
   "config_toggleByDblClick_label": { "message": "Toggle locking of a tree by double click" },
+  "config_lockByDefault_label": { "message": "Lock all tree by default" },
 
   "config_blockExpansion_caption": { "message": "Don't expand tree automatically when" },
   "config_blockExpansionFromFocusedParent_label":       { "message": "a Parent Tab gets focused" },

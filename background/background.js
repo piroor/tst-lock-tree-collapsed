@@ -152,7 +152,10 @@ browser.tabs.onRemoved.addListener(tabId => {
 });
 
 async function restoreLockedState(id) {
-  const locked = await browser.sessions.getTabValue(id, KEY_LOCKED_COLLAPSED);
+  let locked = await browser.sessions.getTabValue(id, KEY_LOCKED_COLLAPSED);
+  if (typeof locked != 'boolean')
+    locked = configs.lockByDefault;
+
   if (locked)
     lockTab(id);
   else
