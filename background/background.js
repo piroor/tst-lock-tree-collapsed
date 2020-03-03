@@ -93,7 +93,10 @@ browser.runtime.onMessageExternal.addListener((message, sender) => {
               tab => tab.states.includes('subtree-collapsed') && lockedTabs.has(tab.id)
             );
             if (nearestLockedCollapsedAncestor) {
+              setTimeout(() => {
+                // immediate refocus may cause unhighlighted active tab on TS...
               browser.tabs.update(nearestLockedCollapsedAncestor.id, { active: true });
+              }, 150);
               return true;
             }
             return false;
