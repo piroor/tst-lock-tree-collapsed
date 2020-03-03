@@ -1,0 +1,18 @@
+{
+  "command_toggleLockCollapsed": {
+      "message": "축소 잠금 켜기/끄기",
+      "hash": "6fde088b8640baa6c970d5c8e9df073c"
+  },
+  "context_lockCollapsed_label": {
+      "message": "축소 상태 잠금(&K)",
+      "hash": "8c3cec70f930b28512423f7a5b5afd24"
+  },
+  "config_autoExpandOnCollapsedChildActiveUnderLockedCollapsed_label": {
+      "message": "접힌 상태에서 잠긴 트리 아래 탭일 경우에도 트리를 펼치기",
+      "hash": "6921763246f0dde6ba8c6c91a9e4a69f"
+  },
+  "config_treeDoubleClickBehavior_toggleLockCollapsed": {
+      "message": "트리가 접힌 상태로 잠기도록 함",
+      "hash": "6fde088b8640baa6c970d5c8e9df073c"
+  }
+}

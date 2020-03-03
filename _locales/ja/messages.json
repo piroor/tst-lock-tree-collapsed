@@ -1,4 +1,9 @@
 {
   "extensionName": { "message": "TST Lock Tree Collapsed" },
-  "extensionDescription": { "message": "Tree Style Tabに対し、ツリーを折りたたまれた状態に固定する機能を提供します。" }
+  "extensionDescription": { "message": "Tree Style Tabに対し、ツリーを折りたたまれた状態に固定する機能を提供します。" },
+
+  "command_toggleLockCollapsed":   { "message": "折りたたみ状態のロックの切り替え" },
+  "context_lockCollapsed_label": { "message": "たたんだ状態でロック(&K)" },
+  "config_autoExpandOnCollapsedChildActiveUnderLockedCollapsed_label": { "message": "折りたたんだ状態でロックされたツリーの配下のタブである場合もツリーを展開する" },
+  "config_treeDoubleClickBehavior_toggleLockCollapsed": { "message": "ツリーの折りたたみ状態のロックの切り替え" }
 }

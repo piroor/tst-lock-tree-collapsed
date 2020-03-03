@@ -1,4 +1,9 @@
 {
   "extensionName": { "message": "TST Lock Tree Collapsed" },
-  "extensionDescription": { "message": "Provides ability to lcok trees in Tree Style Tab  as collapsed." }
+  "extensionDescription": { "message": "Provides ability to lcok trees in Tree Style Tab  as collapsed." },
+
+  "command_toggleLockCollapsed":   { "message": "Toggle Locking of Collapsed" },
+  "context_lockCollapsed_label": { "message": "Loc&k as Collapsed" },
+  "config_autoExpandOnCollapsedChildActiveUnderLockedCollapsed_label": { "message": "even if it is under a \"Locked as Collapsed\" tree" },
+  "config_treeDoubleClickBehavior_toggleLockCollapsed": { "message": "Toggle Locking of Collapsed" }
 }

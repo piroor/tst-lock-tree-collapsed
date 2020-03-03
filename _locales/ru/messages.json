@@ -1,0 +1,6 @@
+{
+  "command_toggleLockCollapsed":   { "message": "Переключить блокировку свернутых" },
+  "context_lockCollapsed_label": { "message": "Блокировать свернутые" },
+  "config_autoExpandOnCollapsedChildActiveUnderLockedCollapsed_label": { "message": "Даже если оно заблокировано как свернутое" },
+  "config_treeDoubleClickBehavior_toggleLockCollapsed": { "message": "Переключить блокировку свернутых" } 
+}
