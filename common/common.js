@@ -11,10 +11,11 @@ export const configs = new Configs({
   context_lockCollapsed: true,
 
   toggleByDblClick: true,
-  blockExpansionFromFocusedParent:       true,
-  blockExpansionFromLongPressCtrlKey:    true,
-  blockExpansionFromEndTabSwitch:        true,
-  blockExpansionFromFocusedCollapsedTab: true
+  blockExpansionFromFocusedParent:        true,
+  blockExpansionFromFocusedBundledParent: true,
+  blockExpansionFromLongPressCtrlKey:     true,
+  blockExpansionFromEndTabSwitch:         true,
+  blockExpansionFromFocusedCollapsedTab:  true
 }, {
   localKeys: [
   ]

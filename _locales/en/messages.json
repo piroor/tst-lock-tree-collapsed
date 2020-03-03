@@ -10,6 +10,7 @@
 
   "config_blockExpansion_caption": { "message": "Don't expand tree automatically when" },
   "config_blockExpansionFromFocusedParent_label":       { "message": "a Parent Tab gets focused" },
+  "config_blockExpansionFromFocusedBundledParent_label": { "message": "a Pinned Tab corresponding to a Parent Tab gets focused" },
   "config_blockExpansionFromFocusedCollapsedTab_label": { "message": "a Collapsed (invisible) Tab gets focused" },
   "config_blockExpansionFromLongPressCtrlKey_label":    { "message": "Long-Press of the Ctrl key" },
   "config_blockExpansionFromEndTabSwitch_label":        { "message": "After tab switch with Ctrl-Tab or Ctrl-Shift-Tab" }
