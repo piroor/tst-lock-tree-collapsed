@@ -126,7 +126,7 @@ browser.runtime.onMessageExternal.addListener((message, sender) => {
                   if (willCancel)
                     return;
                 }
-                catch(e) {
+                catch(_e) {
                 }
                 lastRedirectedParent = nearestLockedCollapsedAncestor.id;
                 // immediate refocus may cause unhighlighted active tab on TS...
