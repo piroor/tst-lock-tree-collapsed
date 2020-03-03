@@ -6,3 +6,134 @@
 'use strict';
 
 const TST_ID = 'treestyletab@piro.sakura.ne.jp';
+
+const KEY_LOCKED_COLLAPSED = 'tst-lock-tree-collapsed-locked-collapsed';
+
+const lockedTabs = new Set();
+
+async function registerToTST() {
+  try {
+    await browser.runtime.sendMessage(TST_ID, {
+      type: 'register-self',
+      name: browser.i18n.getMessage('extensionName'),
+      //icons: browser.runtime.getManifest().icons,
+      listeningTypes: [
+        'sidebar-show',
+        'try-expand-tree-from-focused-parent',
+        'try-expand-tree-from-focused-collapsed-tab',
+        'tab-dblclicked'
+      ],
+      style: `
+        tab-item.${KEY_LOCKED_COLLAPSED} {
+        }
+      `
+    });
+  }
+  catch(_error) {
+    // TST is not available
+  }
+}
+registerToTST();
+
+browser.runtime.onMessageExternal.addListener((message, sender) => {
+  switch (sender.id) {
+    case TST_ID:
+      switch (message.type) {
+        case 'ready':
+          registerToTST();
+          break;
+
+        case 'sidebar-show':
+          browser.tabs.query({ windowId: message.windowId }).then(tabs => {
+            for (const tab of tabs) {
+              restoreLockedState(tab.id);
+            }
+          });
+          break;
+
+        case 'try-expand-tree-from-focused-parent':
+          if (lockedTabs.has(message.tab.id))
+            return Promise.resolve(true);
+          break;
+
+        case 'try-expand-tree-from-focused-collapsed-tab':
+          return (async () => {
+            const lockedCollapsedAncestors = await browser.runtime.sendMessage(TST_ID, {
+              type: 'get-tree',
+              tabs:  message.tab.ancestorTabIds.filter(id => lockedTabs.has(id))
+            });
+            const nearestLockedCollapsedAncestor = lockedCollapsedAncestors.find(
+              tab => tab.states.includes('subtree-collapsed') && lockedTabs.has(tab.id)
+            );
+            if (nearestLockedCollapsedAncestor) {
+              browser.tabs.update(nearestLockedCollapsedAncestor.id, { active: true });
+              return true;
+            }
+            return false;
+          })();
+
+        case 'tab-dblclicked':
+          if (message.button != 0 ||
+              message.twisty ||
+              message.soundButton ||
+              message.closebox ||
+              message.altKey ||
+              message.ctrlKey ||
+              message.metaKey ||
+              message.shiftKey)
+            return;
+          toggleTabLocked(message.tab.id);
+          return Promise.resolve(true);
+      }
+      break;
+  }
+});
+
+browser.tabs.onCreated.addListener(tab => {
+  restoreLockedState(tab.id);
+});
+
+browser.tabs.onRemoved.addListener(tabId => {
+  lockedTabs.delete(tabId);
+});
+
+async function restoreLockedState(id) {
+  const locked = await browser.sessions.getTabValue(id, KEY_LOCKED_COLLAPSED);
+  if (locked)
+    lockTab(id);
+  else
+    unlockTab(id);
+}
+
+function toggleTabLocked(id) {
+  if (lockedTabs.has(id))
+    unlockTab(id);
+  else
+    lockTab(id);
+}
+
+function lockTab(id) {
+  lockedTabs.add(id);
+  browser.runtime.sendMessage(TST_ID, {
+    type:  'add-tab-state',
+    tabs:  [id],
+    state: [KEY_LOCKED_COLLAPSED]
+  });
+  browser.sessions.setTabValue(id, KEY_LOCKED_COLLAPSED, true);
+}
+
+function unlockTab(id) {
+  lockedTabs.delete(id);
+  browser.runtime.sendMessage(TST_ID, {
+    type:  'remove-tab-state',
+    tabs:  [id],
+    state: [KEY_LOCKED_COLLAPSED]
+  });
+  browser.sessions.removeTabValue(id, KEY_LOCKED_COLLAPSED);
+}
+
+browser.tabs.query({}).then(tabs => {
+  for (const tab of tabs) {
+    restoreLockedState(tab.id);
+  }
+});
