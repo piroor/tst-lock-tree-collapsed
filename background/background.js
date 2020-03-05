@@ -36,6 +36,7 @@ async function registerToTST() {
         'sidebar-show',
         'try-expand-tree-from-focused-parent',
         'try-expand-tree-from-focused-bundled-parent',
+        'try-expand-tree-from-attached-child',
         'try-expand-tree-from-long-press-ctrl-key',
         'try-expand-tree-from-end-tab-switch',
         'try-expand-tree-from-focused-collapsed-tab',
@@ -90,6 +91,12 @@ browser.runtime.onMessageExternal.addListener((message, sender) => {
 
         case 'try-expand-tree-from-focused-bundled-parent':
           if (configs.blockExpansionFromFocusedBundledParent &&
+              lockedTabs.has(message.tab.id))
+            return Promise.resolve(true);
+          break;
+
+        case 'try-expand-tree-from-attached-child':
+          if (configs.blockExpansionFromAttachedChild &&
               lockedTabs.has(message.tab.id))
             return Promise.resolve(true);
           break;

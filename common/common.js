@@ -14,6 +14,7 @@ export const configs = new Configs({
   lockByDefault: false,
   blockExpansionFromFocusedParent:        true,
   blockExpansionFromFocusedBundledParent: true,
+  blockExpansionFromAttachedChild:        true,
   blockExpansionFromLongPressCtrlKey:     true,
   blockExpansionFromEndTabSwitch:         true,
   blockExpansionFromFocusedCollapsedTab:  true
