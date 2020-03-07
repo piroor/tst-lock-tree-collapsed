@@ -121,7 +121,7 @@ browser.runtime.onMessageExternal.addListener((message, sender) => {
               type: 'get-tree',
               tabs:  message.tab.ancestorTabIds.filter(id => lockedTabs.has(id))
             });
-            const nearestLockedCollapsedAncestor = lockedCollapsedAncestors.find(
+            let nearestLockedCollapsedAncestor = lockedCollapsedAncestors.find(
               tab => tab.states.includes('subtree-collapsed') && lockedTabs.has(tab.id)
             );
             if (nearestLockedCollapsedAncestor) {
@@ -135,6 +135,20 @@ browser.runtime.onMessageExternal.addListener((message, sender) => {
                 }
                 catch(_e) {
                 }
+
+                // If the active collapsed descendant already lost its focus,
+                // it means that the focus was already changed by someone
+                // e.g. TST itself on its Ctrl-Tab handling.
+                nearestLockedCollapsedAncestor = await browser.runtime.sendMessage(TST_ID, {
+                  type: 'get-tree',
+                  tab:  nearestLockedCollapsedAncestor.id
+                });
+                // In such case we must not refocus tab, because it may produce
+                // unexpected focus back like:
+                // https://github.com/piroor/tst-lock-tree-collapsed/issues/4
+                if (!hasActiveDescendant(nearestLockedCollapsedAncestor))
+                  return;
+
                 lastRedirectedParent = nearestLockedCollapsedAncestor.id;
                 // immediate refocus may cause unhighlighted active tab on TS...
                 browser.tabs.update(nearestLockedCollapsedAncestor.id, { active: true });
@@ -188,6 +202,12 @@ browser.runtime.onMessageExternal.addListener((message, sender) => {
       break;
   }
 });
+
+function hasActiveDescendant(tab) {
+  if (tab.active)
+    return true;
+  return tab.children.some(hasActiveDescendant) || tab.active;
+}
 
 browser.tabs.onCreated.addListener(tab => {
   restoreLockedState(tab.id);
