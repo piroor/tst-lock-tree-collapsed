@@ -2,6 +2,8 @@
 
 [![Build Status](https://travis-ci.org/piroor/tst-lock-tree-collapsed.svg?branch=master)](https://travis-ci.org/piroor/tst-lock-tree-collapsed)
 
+Install package is available at https://addons.mozilla.org/firefox/addon/tst-lock-tree-collapsed/
+
 ----
 
 Provides ability to lock trees in Tree Style Tab  as collapsed.
