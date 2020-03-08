@@ -122,63 +122,55 @@ browser.runtime.onMessageExternal.addListener((message, sender) => {
               type: 'get-tree',
               tabs:  message.tab.ancestorTabIds.filter(id => lockedTabs.has(id))
             });
-            let nearestLockedCollapsedAncestor = lockedCollapsedAncestors.find(
+            const nearestLockedCollapsedAncestor = lockedCollapsedAncestors.find(
               tab => tab.states.includes('subtree-collapsed') && lockedTabs.has(tab.id)
             );
-            if (nearestLockedCollapsedAncestor) {
-              setTimeout(async () => {
-                try {
-                  const willCancel = await browser.runtime.sendMessage('tst-active-tab-in-collapsed-tree@piro.sakura.ne.jp', {
-                    type:           'will-cancel-expansion-from-focused-collapsed-tab',
-                    tabId:          message.tab.id,
-                    ancestorTabIds: message.tab.ancestorTabIds
-                  });
-                  if (willCancel)
-                    return;
-                }
-                catch(_e) {
-                }
-
-                // If the active collapsed descendant already lost its focus,
-                // it means that the focus was already changed by someone
-                // e.g. TST itself on its Ctrl-Tab handling.
-                nearestLockedCollapsedAncestor = await browser.runtime.sendMessage(TST_ID, {
-                  type: 'get-tree',
-                  tab:  nearestLockedCollapsedAncestor.id
-                });
-                // In such case we must not refocus tab, because it may produce
-                // unexpected focus back like:
-                // https://github.com/piroor/tst-lock-tree-collapsed/issues/4
-                if (!hasActiveDescendant(nearestLockedCollapsedAncestor))
-                  return;
-
-                lastRedirectedParent = nearestLockedCollapsedAncestor.id;
-                // immediate refocus may cause unhighlighted active tab on TS...
-                browser.tabs.update(nearestLockedCollapsedAncestor.id, { active: true });
-                setTimeout(() => {
-                  lastRedirectedParent = null;
-                }, 250);
-              }, 150);
+            if (nearestLockedCollapsedAncestor)
               return true;
-            }
             return false;
           })();
 
         case 'try-redirect-focus-from-collaped-tab':
-          return;
           return (async () => {
-            try {
-              const willCancel = await browser.runtime.sendMessage('tst-active-tab-in-collapsed-tree@piro.sakura.ne.jp', {
+            const [treeTabs, willCancel] = await Promise.all([
+              browser.runtime.sendMessage(TST_ID, {
+                type: 'get-tree',
+                tabs: ['nextVisibleCyclic', 'previousVisibleCyclic']
+                  .concat(message.tab.ancestorTabIds.filter(id => lockedTabs.has(id)))
+              }),
+              browser.runtime.sendMessage('tst-active-tab-in-collapsed-tree@piro.sakura.ne.jp', {
                 type:           'will-cancel-expansion-from-focused-collapsed-tab',
                 tabId:          message.tab.id,
                 ancestorTabIds: message.tab.ancestorTabIds
-              });
-              console.log({willCancel});
-              if (willCancel)
-                return true;
-            }
-            catch(_e) {
-            }
+              }).catch(_e => { return false; })
+            ]);
+            const [nextVisible, previousVisible, ...lockedCollapsedAncestors] = treeTabs;
+            if (willCancel)
+              return true;
+
+            const nearestLockedCollapsedAncestor = lockedCollapsedAncestors.find(
+              tab => tab.states.includes('subtree-collapsed') && lockedTabs.has(tab.id)
+            );
+            // In such case we must not refocus tab, because it may produce
+            // unexpected focus back like:
+            // https://github.com/piroor/tst-lock-tree-collapsed/issues/4
+            if (!hasActiveDescendant(nearestLockedCollapsedAncestor))
+              return;
+
+            lastRedirectedParent = nearestLockedCollapsedAncestor.id;
+            // immediate refocus may cause unhighlighted active tab on TS...
+            setTimeout(() => {
+              browser.tabs.update(
+                message.focusDirection < 0 ?
+                  previousVisible.id :
+                  nextVisible.id,
+                { active: true }
+              );
+              setTimeout(() => {
+                lastRedirectedParent = null;
+              }, 250);
+            }, 0);
+            return true;
           })();
 
         case 'tab-dblclicked':
