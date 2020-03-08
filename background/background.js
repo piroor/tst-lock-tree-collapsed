@@ -40,6 +40,7 @@ async function registerToTST() {
         'try-expand-tree-from-long-press-ctrl-key',
         'try-expand-tree-from-end-tab-switch',
         'try-expand-tree-from-focused-collapsed-tab',
+        'try-redirect-focus-from-collaped-tab',
         'tab-dblclicked',
         'fake-contextMenu-shown'
       ],
@@ -128,7 +129,9 @@ browser.runtime.onMessageExternal.addListener((message, sender) => {
               setTimeout(async () => {
                 try {
                   const willCancel = await browser.runtime.sendMessage('tst-active-tab-in-collapsed-tree@piro.sakura.ne.jp', {
-                    type: 'will-cancel-expansion-from-focused-collapsed-tab'
+                    type:           'will-cancel-expansion-from-focused-collapsed-tab',
+                    tabId:          message.tab.id,
+                    ancestorTabIds: message.tab.ancestorTabIds
                   });
                   if (willCancel)
                     return;
@@ -159,6 +162,23 @@ browser.runtime.onMessageExternal.addListener((message, sender) => {
               return true;
             }
             return false;
+          })();
+
+        case 'try-redirect-focus-from-collaped-tab':
+          return;
+          return (async () => {
+            try {
+              const willCancel = await browser.runtime.sendMessage('tst-active-tab-in-collapsed-tree@piro.sakura.ne.jp', {
+                type:           'will-cancel-expansion-from-focused-collapsed-tab',
+                tabId:          message.tab.id,
+                ancestorTabIds: message.tab.ancestorTabIds
+              });
+              console.log({willCancel});
+              if (willCancel)
+                return true;
+            }
+            catch(_e) {
+            }
           })();
 
         case 'tab-dblclicked':
