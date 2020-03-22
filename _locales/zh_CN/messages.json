@@ -1,0 +1,60 @@
+{
+    "extensionName": {
+        "message": "TST Lock Tree Collapsed - TST 锁定折叠标签树",
+        "hash": "c9e6618958af38d87abde39782f2bd2c"
+    },
+    "extensionDescription": {
+        "message": "能够将 树状标签页 中的标签树锁定为折叠状态。",
+        "hash": "6499afddad94adc57684f20fdbedfc98"
+    },
+    "command_toggleLockCollapsed": {
+        "message": "开关折叠锁定",
+        "hash": "6fde088b8640baa6c970d5c8e9df073c"
+    },
+    "context_lockCollapsed_label": {
+        "message": "锁定为折叠状态(&K)",
+        "hash": "8c3cec70f930b28512423f7a5b5afd24"
+    },
+    "config_context_lockCollapsed_label": {
+        "message": "在标签页上下文菜单中显示附加的 “锁定为折叠状态” 命令",
+        "hash": "d14beb615c62119ae79265a8f7a115eb"
+    },
+    "config_toggleByDblClick_label": {
+        "message": "通过双击开关对一个标签树的锁定",
+        "hash": "252a3ba106fa99719a602d709d7a16d1"
+    },
+    "config_lockByDefault_label": {
+        "message": "默认锁定所有标签树",
+        "hash": "8d0ed2700fa86e6faa521f6f131b9eb6"
+    },
+    "config_blockExpansion_caption": {
+        "message": "不要在该情况下自动展开标签树",
+        "hash": "63ef4e2093e808bdcb0d518b37765fb7"
+    },
+    "config_blockExpansionFromFocusedParent_label": {
+        "message": "父标签页被聚焦时",
+        "hash": "d730b7fa5624b8bffbca296e7f456ad6"
+    },
+    "config_blockExpansionFromFocusedBundledParent_label": {
+        "message": "与父标签页相关的固定标签页被聚焦时",
+        "hash": "80d5dc558e94cafd645066eee21f3a48"
+    },
+    "config_blockExpansionFromAttachedChild_label": {
+        "message": "附加一个子标签页时",
+        "hash": "7ced0cc5b9373ba40a1fdb8ea3774a0d"
+    },
+    "config_blockExpansionFromFocusedCollapsedTab_label": {
+        "message": "折叠（不可见）标签页被聚焦时",
+        "hash": "b74954df75baff32b84a9a4108a5727d"
+    },
+    "config_blockExpansionFromLongPressCtrlKey_label": {
+        "message": "长按 Ctrl 按键时",
+        "hash": "34b8537661ac02ceab524b40a91eb374"
+    },
+    "config_blockExpansionFromEndTabSwitch_label": {
+        "message": "通过 Ctrl-Tab 或者 Ctrl-Shift-Tab 进行标签页切换后",
+        "hash": "4e2e23e6605868d229adb0bff572c9c7"
+    },
+
+    "__WET_LOCALE__": { "message": "zh" }
+}
