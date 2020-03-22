@@ -4,7 +4,7 @@
         "hash": "c9e6618958af38d87abde39782f2bd2c"
     },
     "extensionDescription": {
-        "message": "能够将 树状标签页 中的标签树锁定为折叠状态。",
+        "message": "能够将 Tree Style Tab 中的标签树锁定为折叠状态。",
         "hash": "6499afddad94adc57684f20fdbedfc98"
     },
     "command_toggleLockCollapsed": {
@@ -56,5 +56,5 @@
         "hash": "4e2e23e6605868d229adb0bff572c9c7"
     },
 
-    "__WET_LOCALE__": { "message": "zh" }
+    "__WET_LOCALE__": { "message": "zh-CN" }
 }
