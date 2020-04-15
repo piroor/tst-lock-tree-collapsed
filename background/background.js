@@ -291,7 +291,7 @@ async function processMovedTabs() {
 
   let rootTab;
   {
-  const rootTabs = tabs.filter(tab => tab.ancestorTabIds.every(id => !tabIdsSet.has(id)));
+    const rootTabs = tabs.filter(tab => tab.ancestorTabIds.every(id => !tabIdsSet.has(id)));
     // Ignore moves of multiple trees
     if (rootTabs.length > 1)
       return;
@@ -317,12 +317,12 @@ async function processMovedTabs() {
 
   if ((rootTab.moveInfo.fromIndex - rootTab.moveInfo.toIndex) == 1) {
     //console.log('move up ', { rootTab });
-      await browser.runtime.sendMessage(TST_ID, {
-        type:           'move-before',
-        tab:            rootTab.id,
-        referenceTabId: nearestVisibleParent.id,
-        followChildren: true
-      });
+    await browser.runtime.sendMessage(TST_ID, {
+      type:           'move-before',
+      tab:            rootTab.id,
+      referenceTabId: nearestVisibleParent.id,
+      followChildren: true
+    });
     browser.tabs.update(rootTab.id, { active: true });
   }
   else if ((rootTab.moveInfo.toIndex - rootTab.moveInfo.fromIndex) == 1) {
@@ -330,25 +330,25 @@ async function processMovedTabs() {
     const lastDescendantId = getLastDescendantOrSelfId(nearestVisibleParent);
     if (nearestVisibleParent.ancestorTabIds.length > 0) {
       //console.log(' => reattach to the parennt ', nearestVisibleParent.ancestorTabIds[0]);
-        await browser.runtime.sendMessage(TST_ID, {
-          type:        'attach',
-          parent:      nearestVisibleParent.ancestorTabIds[0],
-          child:       rootTab.id,
-          insertAfter: lastDescendantId
-        });
+      await browser.runtime.sendMessage(TST_ID, {
+        type:        'attach',
+        parent:      nearestVisibleParent.ancestorTabIds[0],
+        child:       rootTab.id,
+        insertAfter: lastDescendantId
+      });
     }
     else {
       //console.log(' => detach from tree');
-        await browser.runtime.sendMessage(TST_ID, {
-          type:           'move-after',
-          tab:            rootTab.id,
-          referenceTabId: lastDescendantId,
-          followChildren: true
-        });
-        await browser.runtime.sendMessage(TST_ID, {
-          type: 'detach',
-          tab:  rootTab.id
-        });
+      await browser.runtime.sendMessage(TST_ID, {
+        type:           'move-after',
+        tab:            rootTab.id,
+        referenceTabId: lastDescendantId,
+        followChildren: true
+      });
+      await browser.runtime.sendMessage(TST_ID, {
+        type: 'detach',
+        tab:  rootTab.id
+      });
     }
     browser.tabs.update(rootTab.id, { active: true });
   }
