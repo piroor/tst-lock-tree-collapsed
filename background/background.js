@@ -225,9 +225,150 @@ browser.tabs.onCreated.addListener(tab => {
   restoreLockedState(tab.id);
 });
 
+const mActiveTabs = new Map();
+
+browser.tabs.onActivated.addListener(activeInfo => {
+  setTimeout(() => {
+    mActiveTabs.set(activeInfo.windowId, activeInfo.tabId);
+  }, 250);
+});
+
+browser.windows.onRemoved.addListener(windowId => {
+  mActiveTabs.delete(windowId);
+});
+
 browser.tabs.onRemoved.addListener(tabId => {
   lockedTabs.delete(tabId);
 });
+
+let mMovedTabs = [];
+
+browser.tabs.onMoved.addListener((tabId, moveInfo) => {
+  mMovedTabs.push({
+    id:     tabId,
+    active: mActiveTabs.get(moveInfo.windowId) == tabId,
+    moveInfo
+  });
+  reserveToProcessMovedTabs();
+});
+
+function reserveToProcessMovedTabs() {
+  if (reserveToProcessMovedTabs.reserved)
+    clearTimeout(reserveToProcessMovedTabs.reserved);
+  reserveToProcessMovedTabs.reserved = setTimeout(() => {
+    reserveToProcessMovedTabs.reserved = null;
+    processMovedTabs();
+  }, 250);
+}
+reserveToProcessMovedTabs.reserved = null;
+
+async function processMovedTabs() {
+  // When tabs are moved into a locked-collapsed tree with
+  // Ctrl-Shift-PageUp/PageDown, we should move them away.
+  // https://github.com/piroor/tst-lock-tree-collapsed/issues/10
+  const movedTabs = mMovedTabs;
+  mMovedTabs = [];
+
+  const tabIds    = movedTabs.map(tab => tab.id);
+  const tabIdsSet = new Set(tabIds);
+  const tabs      = await browser.runtime.sendMessage(TST_ID, {
+    type: 'get-tree',
+    tabs: tabIds
+  });
+
+  {
+    const windows = new Set();
+    for (let i = 0, maxi = tabs.length; i < maxi; i++) {
+      const tab = tabs[i];
+      windows.add(tab.windowId);
+      tab.moveInfo = movedTabs[i].moveInfo;
+      tab.active   = movedTabs[i].active;
+    }
+    // Ignore moves on multiple windows
+    if (windows.size > 1)
+      return;
+  }
+
+  const rootTabs = tabs.filter(tab => tab.ancestorTabIds.every(id => !tabIdsSet.has(id)));
+  let activeTab  = null;
+  {
+    const parentIds = new Set();
+    for (const tab of rootTabs) {
+      parentIds.add(tab.ancestorTabIds[0]);
+      if (tab.active)
+        activeTab = tab;
+    }
+    // Ignore moves on multiple trees
+    if (parentIds.size > 1)
+      return;
+    // Ignore moves on non-active tabs
+    if (!activeTab)
+      return;
+  }
+
+  const ancestors = await browser.runtime.sendMessage(TST_ID, {
+    type: 'get-tree',
+    tabs: rootTabs[0].ancestorTabIds
+  });
+  const visibleLockedAncestors = ancestors.filter(ancestor =>
+    lockedTabs.has(ancestor.id) &&
+      ancestor.states.includes('subtree-collapsed') &&
+        !ancestor.states.includes('collapsed')
+  );
+  if (visibleLockedAncestors.length == 0)
+    return;
+  const nearestVisibleParent = visibleLockedAncestors[visibleLockedAncestors.length - 1];
+
+  if (rootTabs.every(tab => (tab.moveInfo.fromIndex - tab.moveInfo.toIndex) == 1)) {
+    //console.log('move up ', { rootTabs });
+    for (const tab of rootTabs) {
+      await browser.runtime.sendMessage(TST_ID, {
+        type:           'move-before',
+        tab:            tab.id,
+        referenceTabId: nearestVisibleParent.id,
+        followChildren: true
+      });
+    }
+    browser.tabs.update(activeTab.id, { active: true });
+  }
+  else if (rootTabs.every(tab => (tab.moveInfo.toIndex - tab.moveInfo.fromIndex) == 1)) {
+    //console.log('move down ', { rootTabs });
+    const lastDescendantId = getLastDescendantOrSelfId(nearestVisibleParent);
+    if (nearestVisibleParent.ancestorTabIds.length > 0) {
+      //console.log(' => reattach to the parennt ', nearestVisibleParent.ancestorTabIds[0]);
+      for (const tab of rootTabs) {
+        await browser.runtime.sendMessage(TST_ID, {
+          type:        'attach',
+          parent:      nearestVisibleParent.ancestorTabIds[0],
+          child:       tab.id,
+          insertAfter: lastDescendantId
+        });
+      }
+    }
+    else {
+      //console.log(' => detach from tree');
+      for (const tab of rootTabs.reverse()) {
+        await browser.runtime.sendMessage(TST_ID, {
+          type:           'move-after',
+          tab:            tab.id,
+          referenceTabId: lastDescendantId,
+          followChildren: true
+        });
+        await browser.runtime.sendMessage(TST_ID, {
+          type: 'detach',
+          tab:  tab.id
+        });
+      }
+    }
+    browser.tabs.update(activeTab.id, { active: true });
+  }
+}
+
+function getLastDescendantOrSelfId(tab) {
+  if (tab.children.length > 0)
+    return getLastDescendantOrSelfId(tab.children[tab.children.length - 1])
+  return tab.id;
+}
 
 async function onMenuShown(info, tab) {
   const updateParams = {};
