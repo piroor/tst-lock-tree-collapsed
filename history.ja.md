@@ -1,6 +1,9 @@
 # 更新履歴
 
  - master/HEAD
+ - 1.0.3 (2020.4.16)
+   * Ctrl-Shift-PageUp/PageDownでのタブ移動について、ロック状態で折りたたまれたツリーを通過するようにした
+   * `zh_CN`言語リソース更新（by [NightSharp](https://github.com/NightSharp), thanks!）
  - 1.0.2 (2020.3.9)
    * [TST Active Tab in Collapsed Tree](https://addons.mozilla.org/firefox/addon/tst-active-tab-in-collapsed-tr)との互換性を向上
  - 1.0.1 (2020.3.8)
