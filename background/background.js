@@ -313,43 +313,43 @@ async function processMovedTabs() {
 
   const rootTabs = tabs.filter(tab => tab.ancestorTabIds.every(id => !tabIdsSet.has(id)));
   for (const rootTab of rootTabs) {
-  if ((rootTab.fromIndex - rootTab.toIndex) == 1) {
-    //console.log('move up ', { rootTab });
-    await browser.runtime.sendMessage(TST_ID, {
-      type:           'move-before',
-      tab:            rootTab.id,
-      referenceTabId: rootTab.nearestVisibleParent.id,
-      followChildren: true
-    });
-    browser.tabs.update(rootTab.id, { active: true });
-  }
-  else if ((rootTab.toIndex - rootTab.fromIndex) == 1) {
-    //console.log('move down ', { rootTab });
-    const lastDescendantId = getLastDescendantOrSelfId(rootTab.nearestVisibleParent);
-    if (rootTab.nearestVisibleParent.ancestorTabIds.length > 0) {
-      //console.log(' => reattach to the parennt ', rootTab.nearestVisibleParent.ancestorTabIds[0]);
+    if ((rootTab.fromIndex - rootTab.toIndex) == 1) {
+      //console.log('move up ', { rootTab });
       await browser.runtime.sendMessage(TST_ID, {
-        type:        'attach',
-        parent:      rootTab.nearestVisibleParent.ancestorTabIds[0],
-        child:       rootTab.id,
-        insertAfter: lastDescendantId
-      });
-    }
-    else {
-      //console.log(' => detach from tree');
-      await browser.runtime.sendMessage(TST_ID, {
-        type:           'move-after',
+        type:           'move-before',
         tab:            rootTab.id,
-        referenceTabId: lastDescendantId,
+        referenceTabId: rootTab.nearestVisibleParent.id,
         followChildren: true
       });
-      await browser.runtime.sendMessage(TST_ID, {
-        type: 'detach',
-        tab:  rootTab.id
-      });
+      browser.tabs.update(rootTab.id, { active: true });
     }
-    browser.tabs.update(rootTab.id, { active: true });
-  }
+    else if ((rootTab.toIndex - rootTab.fromIndex) == 1) {
+      //console.log('move down ', { rootTab });
+      const lastDescendantId = getLastDescendantOrSelfId(rootTab.nearestVisibleParent);
+      if (rootTab.nearestVisibleParent.ancestorTabIds.length > 0) {
+        //console.log(' => reattach to the parennt ', rootTab.nearestVisibleParent.ancestorTabIds[0]);
+        await browser.runtime.sendMessage(TST_ID, {
+          type:        'attach',
+          parent:      rootTab.nearestVisibleParent.ancestorTabIds[0],
+          child:       rootTab.id,
+          insertAfter: lastDescendantId
+        });
+      }
+      else {
+        //console.log(' => detach from tree');
+        await browser.runtime.sendMessage(TST_ID, {
+          type:           'move-after',
+          tab:            rootTab.id,
+          referenceTabId: lastDescendantId,
+          followChildren: true
+        });
+        await browser.runtime.sendMessage(TST_ID, {
+          type: 'detach',
+          tab:  rootTab.id
+        });
+      }
+      browser.tabs.update(rootTab.id, { active: true });
+    }
   }
 }
 
