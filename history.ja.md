@@ -1,6 +1,7 @@
 # 更新履歴
 
  - master/HEAD
+   * Ctrl-Shift-PageUp/PageDownでのタブ移動について、ロック状態で折りたたまれたツリーをより確実に通過するようにした（TST 3.4.10以降が必要です）
  - 1.0.3 (2020.4.16)
    * Ctrl-Shift-PageUp/PageDownでのタブ移動について、ロック状態で折りたたまれたツリーを通過するようにした
    * `zh_CN`言語リソース更新（by [NightSharp](https://github.com/NightSharp), thanks!）
