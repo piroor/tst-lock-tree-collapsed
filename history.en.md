@@ -1,6 +1,7 @@
 # History
 
  - master/HEAD
+ - 1.0.4 (2020.4.21)
    * Move tabs passing over locked and collapsed tree for Ctrl-Shift-PageUp/PageDown more certainly. This change requires TST 3.4.10 and later.
  - 1.0.3 (2020.4.16)
    * Move tabs passing over locked and collapsed tree for Ctrl-Shift-PageUp/PageDown.
