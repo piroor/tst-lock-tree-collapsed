@@ -1,6 +1,6 @@
 # TST Lock Tree Collapsed
 
-[![Build Status](https://travis-ci.org/piroor/tst-lock-tree-collapsed.svg?branch=master)](https://travis-ci.org/piroor/tst-lock-tree-collapsed)
+[![Build Status](https://travis-ci.org/piroor/tst-lock-tree-collapsed.svg?branch=trunk)](https://travis-ci.org/piroor/tst-lock-tree-collapsed)
 
 Install package is available at https://addons.mozilla.org/firefox/addon/tst-lock-tree-collapsed/
 
