@@ -224,7 +224,7 @@ browser.runtime.onMessageExternal.addListener((message, sender) => {
               type: 'get-tree',
               tab:  message.tab.id
             });
-            if (tab.children.length == 0)
+            if (!tab || tab.children.length == 0)
               return false;
             toggleTabLocked(tab.id);
             /*
@@ -251,6 +251,8 @@ browser.runtime.onMessageExternal.addListener((message, sender) => {
 });
 
 function hasActiveDescendant(tab) {
+  if (!tab)
+    return false;
   if (tab.active)
     return true;
   return tab.children.some(hasActiveDescendant) || tab.active;
