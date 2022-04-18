@@ -3,9 +3,9 @@
   "extensionDescription": { "message": "Tree Style Tabに対し、ツリーを折りたたまれた状態に固定する機能を提供します。" },
 
   "command_toggleLockCollapsed":   { "message": "折りたたみ状態のロックの切り替え" },
-  "context_lockCollapsed_label": { "message": "たたんだ状態でロック(&K)" },
+  "context_lockCollapsed_label": { "message": "折りたたみ状態をロック(&K)" },
 
-  "config_context_lockCollapsed_label": { "message": "コンテキストメニューに「たたんだ状態でロック」を追加" },
+  "config_context_lockCollapsed_label": { "message": "コンテキストメニューに「折りたたみ状態をロック」を追加" },
   "config_toggleByDblClick_label": { "message": "タブのダブルクリックでツリーの折りたたみ状態のロックを切り替える" },
   "config_lockByDefault_label": { "message": "初期状態でロックする" },
 
@@ -15,5 +15,6 @@
   "config_blockExpansionFromAttachedChild_label":       { "message": "子タブが追加されたとき" },
   "config_blockExpansionFromFocusedCollapsedTab_label": { "message": "折りたたまれた子孫タブがフォーカスされたとき" },
   "config_blockExpansionFromLongPressCtrlKey_label":    { "message": "Ctrlキーを長押ししたとき" },
-  "config_blockExpansionFromEndTabSwitch_label":        { "message": "Ctrl-Tab/Ctrl-Shift-Tabでのタブ切り替えが完了したとき" }
+  "config_blockExpansionFromEndTabSwitch_label":        { "message": "Ctrl-Tab/Ctrl-Shift-Tabでのタブ切り替えが完了したとき" },
+  "config_blockCollapsionFromOtherExpansion_label":        { "message": "他のツリーが展開されたとき、折りたたみ状態がロックされたツリーは自動で折りたたまない" }
 }

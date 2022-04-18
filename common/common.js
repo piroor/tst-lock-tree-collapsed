@@ -17,7 +17,8 @@ export const configs = new Configs({
   blockExpansionFromAttachedChild:        true,
   blockExpansionFromLongPressCtrlKey:     true,
   blockExpansionFromEndTabSwitch:         true,
-  blockExpansionFromFocusedCollapsedTab:  true
+  blockExpansionFromFocusedCollapsedTab:  true,
+  blockCollapsionFromOtherExpansion:      false
 }, {
   localKeys: [
   ]

@@ -15,5 +15,6 @@
   "config_blockExpansionFromAttachedChild_label":       { "message": "a Child Tab is attached" },
   "config_blockExpansionFromFocusedCollapsedTab_label": { "message": "a Collapsed (invisible) Tab gets focused" },
   "config_blockExpansionFromLongPressCtrlKey_label":    { "message": "Long-Press of the Ctrl key" },
-  "config_blockExpansionFromEndTabSwitch_label":        { "message": "After tab switch with Ctrl-Tab or Ctrl-Shift-Tab" }
+  "config_blockExpansionFromEndTabSwitch_label":        { "message": "After tab switch with Ctrl-Tab or Ctrl-Shift-Tab" },
+  "config_blockCollapsionFromOtherExpansion_label":     { "message": "Don't collapse locked tree even if any other tree is expanded" }
 }

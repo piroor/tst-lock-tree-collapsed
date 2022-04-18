@@ -40,6 +40,7 @@ async function registerToTST() {
         'try-expand-tree-from-long-press-ctrl-key',
         'try-expand-tree-from-end-tab-switch',
         'try-expand-tree-from-focused-collapsed-tab',
+        'try-collapse-tree-from-other-expansion',
         'try-redirect-focus-from-collaped-tab',
         'try-fixup-tree-on-tab-moved',
         'tab-dblclicked',
@@ -128,6 +129,22 @@ browser.runtime.onMessageExternal.addListener((message, sender) => {
               tab => tab.states.includes('subtree-collapsed') && lockedTabs.has(tab.id)
             );
             if (nearestLockedCollapsedAncestor)
+              return true;
+            return false;
+          })();
+
+        case 'try-collapse-tree-from-other-expansion':
+          if (!configs.blockCollapsionFromOtherExpansion)
+            return;
+          return (async () => {
+            const lockedExpandedTabs = await browser.runtime.sendMessage(TST_ID, {
+              type: 'get-tree',
+              tabs:  message.tab.ancestorTabIds.filter(id => lockedTabs.has(id))
+            });
+            const nearestLockedExpandedTab = [message.tab, ...lockedExpandedTabs].find(
+              tab => !tab.states.includes('subtree-collapsed') && lockedTabs.has(tab.id)
+            );
+            if (nearestLockedExpandedTab)
               return true;
             return false;
           })();
