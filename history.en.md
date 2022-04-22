@@ -1,6 +1,8 @@
 # History
 
  - master/HEAD
+ - 1.1.0 (2022.4.22)
+   * Add a new option to keep locked trees expanded when a tree is automatically expanded and others become collapsing. (Note: this option depends on Tree Style Tab 3.8.22 and later.)
  - 1.0.5 (2020.7.29)
    * Better support for the Managed Storage.
  - 1.0.4 (2020.4.21)
