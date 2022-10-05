@@ -2,7 +2,8 @@
 
 ![Build Status](https://github.com/piroor/tst-lock-tree-collapsed/actions/workflows/main.yml/badge.svg?branch=trunk)
 
-Install package is available at https://addons.mozilla.org/firefox/addon/tst-lock-tree-collapsed/
+* [Signed package on AMO](https://addons.mozilla.org/firefox/addon/tst-lock-tree-collapsed/)
+* [Development builds for each commit are available at "Artifacts" of the CI/CD action](https://github.com/piroor/tst-lock-tree-collapsed/actions?query=workflow%3ACI%2FCD)
 
 ----
 
