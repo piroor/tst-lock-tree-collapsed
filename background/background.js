@@ -444,12 +444,21 @@ function getLastDescendantOrSelfId(tab) {
 }
 
 async function onMenuShown(info, tab) {
+  const multiselectedTabs = await getMultiselectedTabs(tab);
+  const treeItems = await appendTreeInfo(multiselectedTabs);
+  const shouldEnable = {
+    lockCollapsed: (treeItems.find(treeItem => treeItem.id == tab.id).children.length > 0),
+    expandExceptLocked: treeItems.some(treeItem => treeItem.children.length > 0),
+    expandAllExceptLocked: true,
+  };
+
   const updates = [];
   for (const [id, params] of Object.entries(menuItemDefinitions)) {
     const updateParams = {};
     const configKey = `context_${id}`;
-    if (configs[configKey] != params.visible) {
-      updateParams.visible = configs[configKey];
+    const visible = configs[configKey] && shouldEnable[id];
+    if (visible != params.visible) {
+      updateParams.visible = visible;
       params.visible = updateParams.visible;
     }
     if (params.type == 'checkbox') {
