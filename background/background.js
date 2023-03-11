@@ -25,27 +25,51 @@ const menuItemDefinition = {
 };
 browser.menus.create(menuItemDefinition);
 
+async function initialize() {
+  try {
+    await registerToTST();
+    browser.runtime.sendMessage(TST_ID, {
+      type:   'fake-contextMenu-create',
+      params: menuItemDefinition
+    });
+  }
+  catch(_error) {
+    // TST is not available
+  }
+}
+configs.$loaded.then(initialize);
+
 async function registerToTST() {
   try {
     const base = `moz-extension://${location.host}`;
+
+    const listeningTypes = [
+      'sidebar-show',
+      'try-redirect-focus-from-collaped-tab',
+      'try-fixup-tree-on-tab-moved',
+      'tab-dblclicked',
+      'fake-contextMenu-shown',
+    ];
+    if (configs.blockExpansionFromFocusedParent)
+      listeningTypes.push('try-expand-tree-from-focused-parent');
+    if (configs.blockExpansionFromFocusedBundledParent)
+      listeningTypes.push('try-expand-tree-from-focused-bundled-parent');
+    if (configs.blockExpansionFromAttachedChild)
+      listeningTypes.push('try-expand-tree-from-attached-child');
+    if (configs.blockExpansionFromLongPressCtrlKey)
+      listeningTypes.push('try-expand-tree-from-long-press-ctrl-key');
+    if (configs.blockExpansionFromEndTabSwitch)
+      listeningTypes.push('try-expand-tree-from-end-tab-switch');
+    if (configs.blockExpansionFromFocusedCollapsedTab)
+      listeningTypes.push('try-expand-tree-from-focused-collapsed-tab');
+    if (configs.blockCollapsionFromOtherExpansion)
+      listeningTypes.push('try-collapse-tree-from-other-expansion');
+
     await browser.runtime.sendMessage(TST_ID, {
       type: 'register-self',
       name: browser.i18n.getMessage('extensionName'),
       //icons: browser.runtime.getManifest().icons,
-      listeningTypes: [
-        'sidebar-show',
-        'try-expand-tree-from-focused-parent',
-        'try-expand-tree-from-focused-bundled-parent',
-        'try-expand-tree-from-attached-child',
-        'try-expand-tree-from-long-press-ctrl-key',
-        'try-expand-tree-from-end-tab-switch',
-        'try-expand-tree-from-focused-collapsed-tab',
-        'try-collapse-tree-from-other-expansion',
-        'try-redirect-focus-from-collaped-tab',
-        'try-fixup-tree-on-tab-moved',
-        'tab-dblclicked',
-        'fake-contextMenu-shown'
-      ],
+      listeningTypes,
       style: `
         tab-item:not(.collapsed).${KEY_LOCKED_COLLAPSED} tab-twisty::before {
           background: url("${base}/resources/ArrowheadDownDouble.svg") no-repeat center / 60%;
@@ -56,16 +80,27 @@ async function registerToTST() {
         }
       `
     });
-    browser.runtime.sendMessage(TST_ID, {
-      type:   'fake-contextMenu-create',
-      params: menuItemDefinition
-    });
   }
   catch(_error) {
     // TST is not available
   }
 }
-registerToTST();
+configs.$addObserver(key => {
+  switch (key) {
+    case 'blockExpansionFromFocusedParent':
+    case 'blockExpansionFromFocusedBundledParent':
+    case 'blockExpansionFromAttachedChild':
+    case 'blockExpansionFromLongPressCtrlKey':
+    case 'blockExpansionFromEndTabSwitch':
+    case 'blockExpansionFromFocusedCollapsedTab':
+    case 'blockCollapsionFromOtherExpansion':
+      registerToTST();
+      break;
+
+    default:
+      break;
+  }
+});
 
 let lastRedirectedParent;
 let mMovedTabsInfo = [];
@@ -75,7 +110,7 @@ browser.runtime.onMessageExternal.addListener((message, sender) => {
     case TST_ID:
       switch (message.type) {
         case 'ready':
-          registerToTST();
+          initialize();
           break;
 
         case 'sidebar-show':
