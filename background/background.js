@@ -509,11 +509,11 @@ browser.commands.onCommand.addListener(async command => {
     active:        true,
     currentWindow: true
   });
-  const miltiselectedTabs = await getMultiselectedTabs(activeTabs[0]);
+  const multiselectedTabs = await getMultiselectedTabs(activeTabs[0]);
   switch (command) {
     case 'toggleLockCollapsed':
       const locked = lockedTabs.has(activeTabs[0].id);
-      for (const tab of miltiselectedTabs) {
+      for (const tab of multiselectedTabs) {
         if (locked)
           unlockTab(tab.id);
         else
