@@ -444,6 +444,7 @@ function getLastDescendantOrSelfId(tab) {
 }
 
 async function onMenuShown(info, tab) {
+  const updates = [];
   for (const [id, params] of Object.entries(menuItemDefinitions)) {
     const updateParams = {};
     const configKey = `context_${id}`;
@@ -459,15 +460,17 @@ async function onMenuShown(info, tab) {
       }
     }
     if (Object.keys(updateParams).length > 0) {
-      browser.menus.update(params.id, updateParams).then(() => {
-        browser.menus.refresh();
-      });
+      updates.push(browser.menus.update(params.id, updateParams));
       browser.runtime.sendMessage(TST_ID, {
         type:   'fake-contextMenu-update',
         params: [params.id, updateParams]
       });
     }
   }
+  if (updates.length > 0)
+    Promise.all(updates).then(() => {
+      browser.menus.refresh();
+    });
 }
 browser.menus.onShown.addListener(onMenuShown);
 
