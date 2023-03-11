@@ -16,5 +16,7 @@
   "config_blockExpansionFromFocusedCollapsedTab_label": { "message": "a Collapsed (invisible) Tab gets focused" },
   "config_blockExpansionFromLongPressCtrlKey_label":    { "message": "Long-Press of the Ctrl key" },
   "config_blockExpansionFromEndTabSwitch_label":        { "message": "After tab switch with Ctrl-Tab or Ctrl-Shift-Tab" },
+  "config_blockExpansionFromExpandCommand_label":       { "message": "\"Expand this Tree\" command (except the top level parent the command is invoked)" },
+  "config_blockExpansionFromExpandAllCommand_label":    { "message": "\"Expand All Trees\" command" },
   "config_blockCollapsionFromOtherExpansion_label":     { "message": "Don't collapse locked tree even if any other tree is expanded" }
 }

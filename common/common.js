@@ -18,7 +18,9 @@ export const configs = new Configs({
   blockExpansionFromLongPressCtrlKey:     true,
   blockExpansionFromEndTabSwitch:         true,
   blockExpansionFromFocusedCollapsedTab:  true,
-  blockCollapsionFromOtherExpansion:      false
+  blockExpansionFromExpandCommand:        false,
+  blockExpansionFromExpandAllCommand:     false,
+  blockCollapsionFromOtherExpansion:      false,
 }, {
   localKeys: [
   ]

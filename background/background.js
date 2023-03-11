@@ -48,6 +48,10 @@ async function registerToTST() {
       listeningTypes.push('try-expand-tree-from-end-tab-switch');
     if (configs.blockExpansionFromFocusedCollapsedTab)
       listeningTypes.push('try-expand-tree-from-focused-collapsed-tab');
+    if (configs.blockExpansionFromExpandCommand)
+      listeningTypes.push('try-expand-tree-from-expand-command');
+    if (configs.blockExpansionFromExpandAllCommand)
+      listeningTypes.push('try-expand-tree-from-expand-all-command');
     if (configs.blockCollapsionFromOtherExpansion)
       listeningTypes.push('try-collapse-tree-from-other-expansion');
 
@@ -86,6 +90,8 @@ configs.$addObserver(key => {
     case 'blockExpansionFromLongPressCtrlKey':
     case 'blockExpansionFromEndTabSwitch':
     case 'blockExpansionFromFocusedCollapsedTab':
+    case 'blockExpansionFromExpandCommand':
+    case 'blockExpansionFromExpandAllCommand':
     case 'blockCollapsionFromOtherExpansion':
       browser.runtime.sendMessage(TST_ID, { type: 'unregister-self' }).then(registerToTST);
       break;
@@ -160,6 +166,19 @@ browser.runtime.onMessageExternal.addListener((message, sender) => {
               return true;
             return false;
           })();
+
+        case 'try-expand-tree-from-expand-command':
+          if (configs.blockExpansionFromExpandCommand &&
+              message.recursivelyExpanded &&
+              lockedTabs.has(message.tab.id))
+            return Promise.resolve(true);
+          break;
+
+        case 'try-expand-tree-from-expand-all-command':
+          if (configs.blockExpansionFromExpandAllCommand &&
+              lockedTabs.has(message.tab.id))
+            return Promise.resolve(true);
+          break;
 
         case 'try-collapse-tree-from-other-expansion':
           if (!configs.blockCollapsionFromOtherExpansion)
