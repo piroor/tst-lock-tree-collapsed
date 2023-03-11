@@ -25,20 +25,6 @@ const menuItemDefinition = {
 };
 browser.menus.create(menuItemDefinition);
 
-async function initialize() {
-  try {
-    await registerToTST();
-    browser.runtime.sendMessage(TST_ID, {
-      type:   'fake-contextMenu-create',
-      params: menuItemDefinition
-    });
-  }
-  catch(_error) {
-    // TST is not available
-  }
-}
-configs.$loaded.then(initialize);
-
 async function registerToTST() {
   try {
     const base = `moz-extension://${location.host}`;
@@ -80,11 +66,18 @@ async function registerToTST() {
         }
       `
     });
+
+    browser.runtime.sendMessage(TST_ID, {
+      type:   'fake-contextMenu-create',
+      params: menuItemDefinition
+    });
   }
   catch(_error) {
     // TST is not available
   }
 }
+configs.$loaded.then(registerToTST);
+
 configs.$addObserver(key => {
   switch (key) {
     case 'blockExpansionFromFocusedParent':
@@ -94,7 +87,7 @@ configs.$addObserver(key => {
     case 'blockExpansionFromEndTabSwitch':
     case 'blockExpansionFromFocusedCollapsedTab':
     case 'blockCollapsionFromOtherExpansion':
-      registerToTST();
+      browser.runtime.sendMessage(TST_ID, { type: 'unregister-self' }).then(registerToTST);
       break;
 
     default:
@@ -110,7 +103,7 @@ browser.runtime.onMessageExternal.addListener((message, sender) => {
     case TST_ID:
       switch (message.type) {
         case 'ready':
-          initialize();
+          registerToTST();
           break;
 
         case 'sidebar-show':
