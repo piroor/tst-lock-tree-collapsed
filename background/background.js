@@ -17,11 +17,11 @@ const lockedTabs = new Set();
 
 const menuItemDefinitions = {
   lockCollapsed: {
-  id:       'locked-collapsed',
-  type:     'checkbox',
-  checked:  false,
-  title:    browser.i18n.getMessage('context_lockCollapsed_label'),
-  contexts: ['tab'],
+    id:       'locked-collapsed',
+    type:     'checkbox',
+    checked:  false,
+    title:    browser.i18n.getMessage('context_lockCollapsed_label'),
+    contexts: ['tab'],
     visible:  true,
   },
   expandExceptLocked: {
@@ -445,28 +445,28 @@ function getLastDescendantOrSelfId(tab) {
 
 async function onMenuShown(info, tab) {
   for (const [id, params] of Object.entries(menuItemDefinitions)) {
-  const updateParams = {};
-  const configKey = `context_${id}`;
-  if (configs[configKey] != params.visible) {
-    updateParams.visible = configs[configKey];
-  params.visible = updateParams.visible;
-  }
-  if (params.type == 'checkbox') {
-  const checked = tab && lockedTabs.has(tab.id);
-  if (checked != params.checked) {
-    updateParams.checked       = checked;
-    params.checked = checked;
-  }
-  }
-  if (Object.keys(updateParams).length > 0) {
-    browser.menus.update(params.id, updateParams).then(() => {
-      browser.menus.refresh();
-    });
-    browser.runtime.sendMessage(TST_ID, {
-      type:   'fake-contextMenu-update',
-      params: [params.id, updateParams]
-    });
-  }
+    const updateParams = {};
+    const configKey = `context_${id}`;
+    if (configs[configKey] != params.visible) {
+      updateParams.visible = configs[configKey];
+      params.visible = updateParams.visible;
+    }
+    if (params.type == 'checkbox') {
+      const checked = tab && lockedTabs.has(tab.id);
+      if (checked != params.checked) {
+        updateParams.checked       = checked;
+        params.checked = checked;
+      }
+    }
+    if (Object.keys(updateParams).length > 0) {
+      browser.menus.update(params.id, updateParams).then(() => {
+        browser.menus.refresh();
+      });
+      browser.runtime.sendMessage(TST_ID, {
+        type:   'fake-contextMenu-update',
+        params: [params.id, updateParams]
+      });
+    }
   }
 }
 browser.menus.onShown.addListener(onMenuShown);
