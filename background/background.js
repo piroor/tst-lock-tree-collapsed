@@ -475,26 +475,28 @@ async function onMenuShown(info, tab) {
 browser.menus.onShown.addListener(onMenuShown);
 
 async function onMenuClicked(info, tab) {
+  if (!tab)
+    return;
   switch(info.menuItemId) {
     case menuItemDefinitions.lockCollapsed.id:
-      if (!tab)
-        return;
-      const tabs = await getMultiselectedTabs(tab);
-      const locked = lockedTabs.has(tabs[0].id);
-      for (const tab of tabs) {
-        if (locked)
-          unlockTab(tab.id);
-        else
-          lockTab(tab.id);
-      }
+      toggleCollapsed(tab, await getMultiselectedTabs(tab));
+      break;
+
+    case menuItemDefinitions.expandExceptLocked.id:
+      expandExceptLocked(await getMultiselectedTabs(tab));
+      break;
+
+    case menuItemDefinitions.expandAllExceptLocked.id:
+      expandAllExceptLocked(tab.windowId);
       break;
   }
 }
 browser.menus.onClicked.addListener(onMenuClicked);
 
-export async function getMultiselectedTabs(tab) {
+async function getMultiselectedTabs(tab) {
   if (!tab)
     return [];
+
   if (tab.highlighted)
     return browser.tabs.query({
       windowId:    tab.windowId,
@@ -504,21 +506,80 @@ export async function getMultiselectedTabs(tab) {
     return [tab];
 }
 
+function toggleCollapsed(activeTab, tabs) {
+  const locked = lockedTabs.has(activeTab.id);
+  for (const tab of tabs) {
+    if (locked)
+      unlockTab(tab.id);
+    else
+      lockTab(tab.id);
+  }
+}
+
+async function appendTreeInfo(tabs) {
+  const treeItems = await browser.runtime.sendMessage(TST_ID, {
+    type: 'get-tree',
+    tabs: tabs.map(tab => tab.id),
+  });
+  return tabs.map((tab, index) => ({
+    ...tab,
+    ...treeItems[index],
+  }));
+}
+
+function flattenTreeItems(treeItems) {
+  const flattenedItems = [];
+  for (const treeItem of treeItems) {
+    flattenedItems.push(treeItem, ...flattenTreeItems(treeItem.children));
+  }
+  return flattenedItems;
+}
+
+function extractExpandableTreeItems(treeItems) {
+  return treeItems.filter(treeItem => (
+    !lockedTabs.has(treeItem.id) &&
+    treeItem.children.length > 0 &&
+    treeItem.states.includes('subtree-collapsed') &&
+    !treeItem.ancestorTabIds.some(id => lockedTabs.has(id))
+  ));
+}
+
+async function expandExceptLocked(tabs) {
+  const treeItems = flattenTreeItems(await appendTreeInfo(tabs));
+  browser.runtime.sendMessage(TST_ID, {
+    type: 'expand-tree',
+    tabs: extractExpandableTreeItems(treeItems).map(treeItem => treeItem.id),
+  });
+}
+
+async function expandAllExceptLocked(windowId) {
+  const tabs = await browser.tabs.query({
+    windowId,
+    hidden: false,
+  });
+  const treeItems = await appendTreeInfo(tabs);
+  browser.runtime.sendMessage(TST_ID, {
+    type: 'expand-tree',
+    tabs: extractExpandableTreeItems(treeItems).map(treeItem => treeItem.id),
+  });
+}
+
 browser.commands.onCommand.addListener(async command => {
   const activeTabs = await browser.tabs.query({
     active:        true,
-    currentWindow: true
+    currentWindow: true,
   });
-  const multiselectedTabs = await getMultiselectedTabs(activeTabs[0]);
   switch (command) {
     case 'toggleLockCollapsed':
-      const locked = lockedTabs.has(activeTabs[0].id);
-      for (const tab of multiselectedTabs) {
-        if (locked)
-          unlockTab(tab.id);
-        else
-          lockTab(tab.id);
-      }
+      toggleCollapsed(activeTabs[0], await getMultiselectedTabs(activeTabs[0]));
+      return;
+
+    case 'expandExceptLocked':
+      expandExceptLocked(await getMultiselectedTabs(activeTabs[0]));
+      return;
+
+    case 'expandAllExceptLocked':
+      expandAllExceptLocked(activeTabs[0].windowId);
       return;
   }
 });
