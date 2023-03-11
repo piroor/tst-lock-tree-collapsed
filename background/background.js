@@ -15,15 +15,31 @@ const KEY_LOCKED_COLLAPSED = 'tst-lock-tree-collapsed-locked-collapsed';
 
 const lockedTabs = new Set();
 
-const menuItemDefinition = {
+const menuItemDefinitions = {
+  lockCollapsed: {
   id:       'locked-collapsed',
   type:     'checkbox',
   checked:  false,
   title:    browser.i18n.getMessage('context_lockCollapsed_label'),
   contexts: ['tab'],
-  visible:  true
+    visible:  true,
+  },
+  expandExceptLocked: {
+    id:       'expand-except-locked',
+    title:    browser.i18n.getMessage('context_expandExceptLocked_label'),
+    contexts: ['tab'],
+    visible:  false,
+  },
+  expandAllExceptLocked: {
+    id:       'expand-all-except-locked',
+    title:    browser.i18n.getMessage('context_expandAllExceptLocked_label'),
+    contexts: ['tab'],
+    visible:  false,
+  },
 };
-browser.menus.create(menuItemDefinition);
+for (const definition of Object.values(menuItemDefinitions)) {
+  browser.menus.create(definition);
+}
 
 async function registerToTST() {
   try {
@@ -71,10 +87,12 @@ async function registerToTST() {
       `
     });
 
-    browser.runtime.sendMessage(TST_ID, {
-      type:   'fake-contextMenu-create',
-      params: menuItemDefinition
-    });
+    for (const params of Object.values(menuItemDefinitions)) {
+      browser.runtime.sendMessage(TST_ID, {
+        type: 'fake-contextMenu-create',
+        params,
+      });
+    }
   }
   catch(_error) {
     // TST is not available
@@ -426,31 +444,36 @@ function getLastDescendantOrSelfId(tab) {
 }
 
 async function onMenuShown(info, tab) {
+  for (const [id, params] of Object.entries(menuItemDefinitions)) {
   const updateParams = {};
-  if (configs.context_lockCollapsed != menuItemDefinition.visible) {
-    updateParams.visible       = configs.context_lockCollapsed;
-    menuItemDefinition.visible = updateParams.visible;
+  const configKey = `context_${id}`;
+  if (configs[configKey] != params.visible) {
+    updateParams.visible = configs[configKey];
+  params.visible = updateParams.visible;
   }
+  if (params.type == 'checkbox') {
   const checked = tab && lockedTabs.has(tab.id);
-  if (checked != menuItemDefinition.checked) {
+  if (checked != params.checked) {
     updateParams.checked       = checked;
-    menuItemDefinition.checked = checked;
+    params.checked = checked;
+  }
   }
   if (Object.keys(updateParams).length > 0) {
-    browser.menus.update(menuItemDefinition.id, updateParams).then(() => {
+    browser.menus.update(params.id, updateParams).then(() => {
       browser.menus.refresh();
     });
     browser.runtime.sendMessage(TST_ID, {
       type:   'fake-contextMenu-update',
-      params: [menuItemDefinition.id, updateParams]
+      params: [params.id, updateParams]
     });
+  }
   }
 }
 browser.menus.onShown.addListener(onMenuShown);
 
 async function onMenuClicked(info, tab) {
   switch(info.menuItemId) {
-    case menuItemDefinition.id:
+    case menuItemDefinitions.lockCollapsed.id:
       if (!tab)
         return;
       const tabs = await getMultiselectedTabs(tab);

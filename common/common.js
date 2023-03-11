@@ -9,6 +9,8 @@ import Configs from '/extlib/Configs.js';
 
 export const configs = new Configs({
   context_lockCollapsed: true,
+  context_expandExceptLocked: false,
+  context_expandAllExceptLocked: false,
 
   toggleByDblClick: true,
   lockByDefault: false,

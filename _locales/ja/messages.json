@@ -4,10 +4,18 @@
 
   "command_toggleLockCollapsed":   { "message": "折りたたみ状態のロックの切り替え" },
   "context_lockCollapsed_label": { "message": "折りたたみ状態をロック(&K)" },
+  "command_expandExceptLocked":   { "message": "このツリーを展開（ロックされたツリー以外）" },
+  "context_expandExceptLocked_label": { "message": "このツリーを展開（ロックされたツリー以外）(&E)" },
+  "command_expandAllExceptLocked":   { "message": "すべてのツリーを展開（ロックされたツリー以外）" },
+  "context_expandAllExceptLocked_label": { "message": "すべてのツリーを展開（ロックされたツリー以外）(&A)" },
 
-  "config_context_lockCollapsed_label": { "message": "コンテキストメニューに「折りたたみ状態をロック」を追加" },
   "config_toggleByDblClick_label": { "message": "タブのダブルクリックでツリーの折りたたみ状態のロックを切り替える" },
   "config_lockByDefault_label": { "message": "初期状態でロックする" },
+
+  "config_context_caption":                     { "message": "コンテキストメニューに以下のコマンドを追加" },
+  "config_context_lockCollapsed_label":         { "message": "折りたたみ状態をロック" },
+  "config_context_expandExceptLocked_label":    { "message": "このツリーを展開（ロックされたツリー以外）" },
+  "config_context_expandAllExceptLocked_label": { "message": "すべてのツリーを展開（ロックされたツリー以外）" },
 
   "config_blockExpansion_caption": { "message": "折りたたんだ状態でロックされたツリーは以下の場面で自動展開しない" },
   "config_blockExpansionFromFocusedParent_label":       { "message": "親タブがフォーカスされたとき" },

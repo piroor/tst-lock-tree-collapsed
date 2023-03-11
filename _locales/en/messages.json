@@ -4,10 +4,18 @@
 
   "command_toggleLockCollapsed":   { "message": "Toggle Locking of Collapsed" },
   "context_lockCollapsed_label": { "message": "Loc&k as Collapsed" },
+  "command_expandExceptLocked":   { "message": "Expand this Tree Except Locked" },
+  "context_expandExceptLocked_label": { "message": "&Expand this Tree Except Locked" },
+  "command_expandAllExceptLocked":   { "message": "Expand All Except Locked" },
+  "context_expandAllExceptLocked_label": { "message": "Expand &All Except Locked" },
 
-  "config_context_lockCollapsed_label": { "message": "Show \"Lock as Collapsed\" extra tab context menu command" },
   "config_toggleByDblClick_label": { "message": "Toggle locking of a tree by double click" },
   "config_lockByDefault_label": { "message": "Lock all tree by default" },
+
+  "config_context_caption":                     { "message": "Extra tab context menu commands" },
+  "config_context_lockCollapsed_label":         { "message": "Lock as Collapsed" },
+  "config_context_expandExceptLocked_label":    { "message": "Expand this Tree Except Locked" },
+  "config_context_expandAllExceptLocked_label": { "message": "Expand All Except Locked" },
 
   "config_blockExpansion_caption": { "message": "Don't expand tree automatically when" },
   "config_blockExpansionFromFocusedParent_label":       { "message": "a Parent Tab gets focused" },

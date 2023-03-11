@@ -16,6 +16,12 @@
   "commands": {
     "toggleLockCollapsed": {
       "description": "__MSG_command_toggleLockCollapsed__"
+    },
+    "expandExceptLocked": {
+      "description": "__MSG_command_expandExceptLocked__"
+    },
+    "expandAllExceptLocked": {
+      "description": "__MSG_command_expandAllExceptLocked__"
     }
   },
   "options_ui": {
