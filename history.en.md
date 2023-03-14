@@ -1,6 +1,7 @@
 # History
 
  - master/HEAD
+ - 1.2.0 (2023.3.14)
    * Add ability to block expansion of locked trees by TST's built-in context menu commands "Expand this Tree recursively" and "Expand All" for TST 3.9.13 and later. (Disabled by default and you need to activate them manually.)
    * Add new context menu commands "Expand this Tree Except Locked" and "Expand All Except Locked". (Disabled by default and you need to activate them manually.)
  - 1.1.0 (2022.4.22)
