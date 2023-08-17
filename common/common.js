@@ -23,6 +23,8 @@ export const configs = new Configs({
   blockExpansionFromExpandCommand:        false,
   blockExpansionFromExpandAllCommand:     false,
   blockCollapsionFromOtherExpansion:      false,
+  blockCollapsionFromCollapseCommand:     false,
+  blockCollapsionFromCollapseAllCommand:  false,
 }, {
   localKeys: [
   ]

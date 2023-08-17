@@ -70,6 +70,10 @@ async function registerToTST() {
       listeningTypes.push('try-expand-tree-from-expand-all-command');
     if (configs.blockCollapsionFromOtherExpansion)
       listeningTypes.push('try-collapse-tree-from-other-expansion');
+    if (configs.blockCollapsionFromCollapseCommand)
+      listeningTypes.push('try-collapse-tree-from-collapse-command');
+    if (configs.blockCollapsionFromCollapseCommand)
+      listeningTypes.push('try-collapse-tree-from-collapse-all-command');
 
     await browser.runtime.sendMessage(TST_ID, {
       type: 'register-self',
@@ -111,6 +115,8 @@ configs.$addObserver(key => {
     case 'blockExpansionFromExpandCommand':
     case 'blockExpansionFromExpandAllCommand':
     case 'blockCollapsionFromOtherExpansion':
+    case 'blockCollapsionFromCollapseCommand':
+    case 'blockCollapsionFromCollapseAllCommand':
       browser.runtime.sendMessage(TST_ID, { type: 'unregister-self' }).then(registerToTST);
       break;
 
@@ -213,6 +219,19 @@ browser.runtime.onMessageExternal.addListener((message, sender) => {
               return true;
             return false;
           })();
+
+        case 'try-collapse-tree-from-collapse-command':
+          if (configs.blockCollapsionFromCollapseCommand &&
+              message.recursivelyCollapsed &&
+              lockedTabs.has(message.tab.id))
+            return Promise.resolve(true);
+          break;
+
+        case 'try-collapse-tree-from-collapse-all-command':
+          if (configs.blockCollapsionFromCollapseAllCommand &&
+              lockedTabs.has(message.tab.id))
+            return Promise.resolve(true);
+          break;
 
         case 'try-redirect-focus-from-collaped-tab':
           return (async () => {
