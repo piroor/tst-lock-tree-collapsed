@@ -17,7 +17,7 @@
   "config_context_expandExceptLocked_label":    { "message": "Expand this Tree Except Locked" },
   "config_context_expandAllExceptLocked_label": { "message": "Expand All Except Locked" },
 
-  "config_blockExpansion_caption": { "message": "Don't expand tree automatically when" },
+  "config_blockExpansion_caption": { "message": "Don't expand locked tree automatically when" },
   "config_blockExpansionFromFocusedParent_label":       { "message": "a Parent Tab gets focused" },
   "config_blockExpansionFromFocusedBundledParent_label": { "message": "a Pinned Tab corresponding to a Parent Tab gets focused" },
   "config_blockExpansionFromAttachedChild_label":       { "message": "a Child Tab is attached" },

@@ -17,7 +17,7 @@
   "config_context_expandExceptLocked_label":    { "message": "このツリーを展開（ロックされたツリー以外）" },
   "config_context_expandAllExceptLocked_label": { "message": "すべてのツリーを展開（ロックされたツリー以外）" },
 
-  "config_blockExpansion_caption": { "message": "折りたたんだ状態でロックされたツリーは以下の場面で自動展開しない" },
+  "config_blockExpansion_caption": { "message": "状態をロックしたツリーは以下の場面で自動展開しない" },
   "config_blockExpansionFromFocusedParent_label":       { "message": "親タブがフォーカスされたとき" },
   "config_blockExpansionFromFocusedBundledParent_label": { "message": "親タブに対応するピン留めされたタブがフォーカスされたとき" },
   "config_blockExpansionFromAttachedChild_label":       { "message": "子タブが追加されたとき" },
@@ -27,6 +27,6 @@
   "config_blockExpansionFromExpandCommand_label":       { "message": "「このツリーを展開」コマンド実行時（コマンド実行対象となった最上位の親を除く）" },
   "config_blockExpansionFromExpandAllCommand_label":    { "message": "「すべてのツリーを展開」コマンド実行時" },
 
-  "config_blockCollapsion_caption":                     { "message": "折りたたんだ状態でロックされたツリーは以下の場面で自動的に折りたたまない" },
+  "config_blockCollapsion_caption":                     { "message": "状態をロックしたツリーは以下の場面で自動的に折りたたまない" },
   "config_blockCollapsionFromOtherExpansion_label":     { "message": "他のツリーが展開されたとき" }
 }
