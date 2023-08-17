@@ -26,5 +26,7 @@
   "config_blockExpansionFromEndTabSwitch_label":        { "message": "Ctrl-Tab/Ctrl-Shift-Tabでのタブ切り替えが完了したとき" },
   "config_blockExpansionFromExpandCommand_label":       { "message": "「このツリーを展開」コマンド実行時（コマンド実行対象となった最上位の親を除く）" },
   "config_blockExpansionFromExpandAllCommand_label":    { "message": "「すべてのツリーを展開」コマンド実行時" },
-  "config_blockCollapsionFromOtherExpansion_label":        { "message": "他のツリーが展開されたとき、折りたたみ状態がロックされたツリーは自動で折りたたまない" }
+
+  "config_blockCollapsion_caption":                     { "message": "折りたたんだ状態でロックされたツリーは以下の場面で自動的に折りたたまない" },
+  "config_blockCollapsionFromOtherExpansion_label":     { "message": "他のツリーが展開されたとき" }
 }
