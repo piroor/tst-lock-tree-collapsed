@@ -1,6 +1,8 @@
 # History
 
  - master/HEAD
+ - 1.3.0 (2023.9.9)
+   * Add ability to block collapsing of locked trees by TST's built-in context menu commands "Collapse this Tree recursively" and "Collapse All" for TST 3.9.17 and later. (Disabled by default and you need to activate them manually.)
  - 1.2.0 (2023.3.14)
    * Add ability to block expansion of locked trees by TST's built-in context menu commands "Expand this Tree recursively" and "Expand All" for TST 3.9.13 and later. (Disabled by default and you need to activate them manually.)
    * Add new context menu commands "Expand this Tree Except Locked" and "Expand All Except Locked". (Disabled by default and you need to activate them manually.)
