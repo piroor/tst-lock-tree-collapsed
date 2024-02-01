@@ -6,7 +6,8 @@
 'use strict';
 
 import {
-  configs
+  configs,
+  nextFrame,
 } from '/common/common.js';
 
 const TST_ID = 'treestyletab@piro.sakura.ne.jp';
@@ -619,9 +620,9 @@ async function restoreLockedState(id) {
     locked = configs.lockByDefault;
 
   if (locked)
-    lockTab(id);
+    lockTab(id, { restore: true });
   else
-    unlockTab(id);
+    unlockTab(id, { restore: true });
 }
 
 function toggleTabLocked(id) {
@@ -631,8 +632,15 @@ function toggleTabLocked(id) {
     lockTab(id);
 }
 
-function lockTab(id) {
+const mToBeLockedTabIds = new Set();
+
+function lockTab(id, { restore } = {}) {
   lockedTabs.add(id);
+  if (restore) {
+    mToBeLockedTabIds.add(id);
+    reserveBulkLockUnlockToRestore();
+    return;
+  }
   browser.runtime.sendMessage(TST_ID, {
     type:  'add-tab-state',
     tabs:  [id],
@@ -641,14 +649,48 @@ function lockTab(id) {
   browser.sessions.setTabValue(id, KEY_LOCKED_COLLAPSED, true);
 }
 
-function unlockTab(id) {
+const mToBeUnlockedTabIds = new Set();
+
+function unlockTab(id, { restore } = {}) {
   lockedTabs.delete(id);
+  if (restore) {
+    mToBeUnlockedTabIds.add(id);
+    reserveBulkLockUnlockToRestore();
+    return;
+  }
   browser.runtime.sendMessage(TST_ID, {
     type:  'remove-tab-state',
     tabs:  [id],
     state: [KEY_LOCKED_COLLAPSED]
   });
   browser.sessions.removeTabValue(id, KEY_LOCKED_COLLAPSED);
+}
+
+function reserveBulkLockUnlockToRestore() {
+  const startAt = `${Date.now()}-${parseInt(Math.random() * 65000)}`;
+  reserveBulkLockUnlockToRestore.lastStartedAt = startAt;
+  nextFrame().then(() => {
+    if (reserveBulkLockUnlockToRestore.lastStartedAt != startAt)
+      return;
+
+    const toBeLockedTabs   = [...mToBeLockedTabIds];
+    const toBeUnlockedTabs = [...mToBeUnlockedTabIds];
+    mToBeLockedTabIds.clear();
+    mToBeUnlockedTabIds.clear();
+
+    if (toBeLockedTabs.length > 0)
+      browser.runtime.sendMessage(TST_ID, {
+        type:  'add-tab-state',
+        tabs:  toBeLockedTabs,
+        state: [KEY_LOCKED_COLLAPSED]
+      });
+    if (toBeUnlockedTabs.length > 0)
+      browser.runtime.sendMessage(TST_ID, {
+        type:  'remove-tab-state',
+        tabs:  toBeUnlockedTabs,
+        state: [KEY_LOCKED_COLLAPSED]
+      });
+  });
 }
 
 browser.tabs.query({}).then(tabs => {
