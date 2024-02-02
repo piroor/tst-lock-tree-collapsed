@@ -7,7 +7,6 @@
 
 import {
   configs,
-  nextFrame,
 } from '/common/common.js';
 
 const TST_ID = 'treestyletab@piro.sakura.ne.jp';
@@ -669,7 +668,7 @@ function unlockTab(id, { restore } = {}) {
 function reserveBulkLockUnlockToRestore() {
   const startAt = `${Date.now()}-${parseInt(Math.random() * 65000)}`;
   reserveBulkLockUnlockToRestore.lastStartedAt = startAt;
-  nextFrame().then(() => {
+  window.requestAnimationFrame(() => {
     if (reserveBulkLockUnlockToRestore.lastStartedAt != startAt)
       return;
 
