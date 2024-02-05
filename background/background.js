@@ -465,8 +465,9 @@ function getLastDescendantOrSelfId(tab) {
 async function onMenuShown(info, tab) {
   const multiselectedTabs = await getMultiselectedTabs(tab);
   const treeItems = await appendTreeInfo(multiselectedTabs);
+  const treeItemForTab = treeItems.find(treeItem => treeItem.id == tab.id);
   const shouldEnable = {
-    lockCollapsed: (treeItems.find(treeItem => treeItem.id == tab.id).children.length > 0),
+    lockCollapsed: (treeItemForTab && treeItemForTab.children.length > 0),
     expandExceptLocked: treeItems.some(treeItem => treeItem.children.length > 0),
     expandAllExceptLocked: true,
   };
