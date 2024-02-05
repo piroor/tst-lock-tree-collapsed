@@ -80,6 +80,7 @@ async function registerToTST() {
       name: browser.i18n.getMessage('extensionName'),
       //icons: browser.runtime.getManifest().icons,
       listeningTypes,
+      allowBulkMessaging: true,
       style: `
         tab-item:not(.collapsed).${KEY_LOCKED_COLLAPSED} tab-twisty::before {
           background: url("${base}/resources/ArrowheadDownDouble.svg") no-repeat center / 60%;
@@ -128,9 +129,15 @@ configs.$addObserver(key => {
 let lastRedirectedParent;
 let mMovedTabsInfo = [];
 
-browser.runtime.onMessageExternal.addListener((message, sender) => {
+function onMessageExternal(message, sender) {
   switch (sender.id) {
     case TST_ID:
+      if (message && message.messages) {
+        for (const oneMessage of message.messages) {
+          onMessageExternal(oneMessage, sender);
+        }
+        break;
+      }
       switch (message.type) {
         case 'ready':
           registerToTST();
@@ -349,7 +356,8 @@ browser.runtime.onMessageExternal.addListener((message, sender) => {
       }
       break;
   }
-});
+}
+browser.runtime.onMessageExternal.addListener(onMessageExternal);
 
 function hasActiveDescendant(tab) {
   if (!tab)
