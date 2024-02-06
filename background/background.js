@@ -84,6 +84,7 @@ async function registerToTST() {
         //icons: browser.runtime.getManifest().icons,
         listeningTypes,
         allowBulkMessaging: true,
+        lightTree: true,
         style: `
           tab-item:not(.collapsed).${KEY_LOCKED_COLLAPSED} tab-twisty::before {
             background: url("${base}/resources/ArrowheadDownDouble.svg") no-repeat center / 60%;
