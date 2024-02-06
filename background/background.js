@@ -14,6 +14,7 @@ const TST_ID = 'treestyletab@piro.sakura.ne.jp';
 const KEY_LOCKED_COLLAPSED = 'tst-lock-tree-collapsed-locked-collapsed';
 
 const lockedTabs = new Set();
+let mGetTreeType = 'get-tree';
 
 const menuItemDefinitions = {
   lockCollapsed: {
@@ -75,22 +76,31 @@ async function registerToTST() {
     if (configs.blockCollapsionFromCollapseCommand)
       listeningTypes.push('try-collapse-tree-from-collapse-all-command');
 
-    await browser.runtime.sendMessage(TST_ID, {
-      type: 'register-self',
-      name: browser.i18n.getMessage('extensionName'),
-      //icons: browser.runtime.getManifest().icons,
-      listeningTypes,
-      allowBulkMessaging: true,
-      style: `
-        tab-item:not(.collapsed).${KEY_LOCKED_COLLAPSED} tab-twisty::before {
-          background: url("${base}/resources/ArrowheadDownDouble.svg") no-repeat center / 60%;
-        }
-        :root.simulate-svg-context-fill tab-item:not(.collapsed).${KEY_LOCKED_COLLAPSED} tab-twisty::before {
-          background: var(--tab-text);
-          mask: url("${base}/resources/ArrowheadDownDouble.svg") no-repeat center / 60%;
-        }
-      `
-    });
+    const [TSTVersion] = await Promise.all([
+      browser.runtime.sendMessage(TST_ID, { type: 'vet-version' }),
+      browser.runtime.sendMessage(TST_ID, {
+        type: 'register-self',
+        name: browser.i18n.getMessage('extensionName'),
+        //icons: browser.runtime.getManifest().icons,
+        listeningTypes,
+        allowBulkMessaging: true,
+        style: `
+          tab-item:not(.collapsed).${KEY_LOCKED_COLLAPSED} tab-twisty::before {
+            background: url("${base}/resources/ArrowheadDownDouble.svg") no-repeat center / 60%;
+          }
+          :root.simulate-svg-context-fill tab-item:not(.collapsed).${KEY_LOCKED_COLLAPSED} tab-twisty::before {
+            background: var(--tab-text);
+            mask: url("${base}/resources/ArrowheadDownDouble.svg") no-repeat center / 60%;
+          }
+        `
+      }),
+    ]);
+    if (TSTVersion && parseInt(TSTVersion.split('.')[0]) >= 4) {
+      mGetTreeType = 'get-light-tree';
+    }
+    else {
+      mGetTreeType = 'get-tree';
+    }
 
     for (const params of Object.values(menuItemDefinitions)) {
       browser.runtime.sendMessage(TST_ID, {
@@ -187,8 +197,8 @@ function onMessageExternal(message, sender) {
             return;
           return (async () => {
             const lockedCollapsedAncestors = await browser.runtime.sendMessage(TST_ID, {
-              type: 'get-tree',
-              tabs:  message.tab.ancestorTabIds.filter(id => lockedTabs.has(id))
+              type: mGetTreeType,
+              tabs: message.tab.ancestorTabIds.filter(id => lockedTabs.has(id)),
             });
             const nearestLockedCollapsedAncestor = lockedCollapsedAncestors.find(
               tab => tab.states.includes('subtree-collapsed') && lockedTabs.has(tab.id)
@@ -216,8 +226,8 @@ function onMessageExternal(message, sender) {
             return;
           return (async () => {
             const lockedExpandedTabs = await browser.runtime.sendMessage(TST_ID, {
-              type: 'get-tree',
-              tabs:  message.tab.ancestorTabIds.filter(id => lockedTabs.has(id))
+              type: mGetTreeType,
+              tabs: message.tab.ancestorTabIds.filter(id => lockedTabs.has(id))
             });
             const nearestLockedExpandedTab = [message.tab, ...lockedExpandedTabs].find(
               tab => !tab.states.includes('subtree-collapsed') && lockedTabs.has(tab.id)
@@ -244,7 +254,7 @@ function onMessageExternal(message, sender) {
           return (async () => {
             const [treeTabs, willCancel] = await Promise.all([
               browser.runtime.sendMessage(TST_ID, {
-                type: 'get-tree',
+                type: mGetTreeType,
                 tabs: ['nextVisibleCyclic', 'previousVisibleCyclic']
                   .concat(message.tab.ancestorTabIds.filter(id => lockedTabs.has(id)))
               }),
@@ -291,7 +301,7 @@ function onMessageExternal(message, sender) {
                message.parent.ancestorTabIds.some(id => lockedTabs.has(id)))) {
             return (async () => {
               const ancestors = [message.parent].concat(await browser.runtime.sendMessage(TST_ID, {
-                type: 'get-tree',
+                type: mGetTreeType,
                 tabs: message.parent.ancestorTabIds
               }));
               const visibleLockedAncestors = ancestors.filter(ancestor =>
@@ -305,7 +315,7 @@ function onMessageExternal(message, sender) {
               mMovedTabsInfo = mMovedTabsInfo.filter(info => info.id != message.tab.id);
               mMovedTabsInfo.push({
                 id:        message.tab.id,
-                tab:       message.tab,
+                tab:       await browser.tabs.get(message.tab.id).then(tab => ({ ...tab, ...message.tab })),
                 toIndex:   message.toIndex,
                 fromIndex: message.fromIndex,
                 nearestVisibleParent
@@ -328,18 +338,18 @@ function onMessageExternal(message, sender) {
               !configs.toggleByDblClick)
             return;
           return (async () => {
-            const tab = await browser.runtime.sendMessage(TST_ID, {
-              type: 'get-tree',
+            const treeItem = await browser.runtime.sendMessage(TST_ID, {
+              type: mGetTreeType,
               tab:  message.tab.id
             });
-            if (!tab || tab.children.length == 0)
+            if (!treeItem || treeItem.children.length == 0)
               return false;
-            toggleTabLocked(tab.id);
+            toggleTabLocked(treeItem.id);
             /*
-            if (lockedTabs.has(tab.id)) {
+            if (lockedTabs.has(treeItem.id)) {
               browser.runtime.sendMessage(TST_ID, {
                 type: 'collapse-tree',
-                tab:  tab.id
+                tab:  treeItem.id
               });
             }
             */
@@ -408,8 +418,8 @@ async function processMovedTabs() {
   const tabIds    = movedTabsInfo.map(info => info.id);
   const tabIdsSet = new Set(tabIds);
   const tabs      = await browser.runtime.sendMessage(TST_ID, {
-    type: 'get-tree',
-    tabs: tabIds
+    type: mGetTreeType,
+    tabs: tabIds,
   });
 
   {
@@ -555,7 +565,7 @@ function toggleCollapsed(activeTab, tabs) {
 
 async function appendTreeInfo(tabs) {
   const treeItems = await browser.runtime.sendMessage(TST_ID, {
-    type: 'get-tree',
+    type: mGetTreeType,
     tabs: tabs.map(tab => tab.id),
   });
   return tabs.map((tab, index) => ({
