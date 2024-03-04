@@ -177,8 +177,28 @@ function onMessageExternal(message, sender) {
 
         case 'try-expand-tree-from-attached-child':
           if (configs.blockExpansionFromAttachedChild &&
-              lockedTabs.has(message.tab.id))
+              lockedTabs.has(message.tab.id)) {
+            if (message.tab.states.includes('newtab-command-tab') ||
+                message.tab.states.includes('duplicated') ||
+                message.tab.states.includes('restored') ||
+                message.tab.states.includes('from-external') ||
+                message.tab.states.includes('from-firefox-view') ||
+                message.tab.states.includes('opened-for-same-website')) {
+              switch (configs.redirectChildNotFromExistingTabsUnderLockedCollapsedTree) {
+                case 'none':
+                  break;
+
+                case 'independent':
+                  // TODO: move the tab to the end of tabs
+                  break;
+
+                case 'nextsibling':
+                  // TODO: move the tab next to the most nearest expanded ancestor
+                  break;
+              }
+            }
             return Promise.resolve(true);
+          }
           break;
 
         case 'try-expand-tree-from-long-press-ctrl-key':
