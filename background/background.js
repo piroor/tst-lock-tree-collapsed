@@ -419,11 +419,16 @@ browser.tabs.onRemoved.addListener(tabId => {
 
 async function tryProcessChildAttachedInLockedCollapsedTree({ child, parent }) {
   log('tryProcessChildAttachedInLockedCollapsedTree ', { child, parent });
-  const childStates = new Set(child?.states || []);
-  if (!childStates.has('creating'))
+  if (child && !child.states.includes('creating'))
     return;
 
-  /*
+  await wait(1000); // TODO: we need to wait until it is completely handled by TST itself. 1000msec is just a workaround until we implement something mecanism to wait until that certainly.
+
+  // to get finally detected states
+  child = await browser.runtime.sendMessage(TST_ID, { type: 'get-light-tree', tab: child.id });
+
+  const childStates = new Set(child.states);
+  log('states: ', childStates);
   if (!(childStates.has('newtab-command-tab') ||
         childStates.has('duplicated') ||
         childStates.has('restored') ||
@@ -431,9 +436,7 @@ async function tryProcessChildAttachedInLockedCollapsedTree({ child, parent }) {
         childStates.has('from-firefox-view') ||
         childStates.has('opened-for-same-website')))
     return;
-  */
 
-  await wait(1000); // TODO: we need to wait until it is completely handled by TST itself. 1000msec is just a workaround until we implement something mecanism to wait until that certainly.
   switch (configs.redirectChildNotFromExistingTabsUnderLockedCollapsedTree) {
     case 'none':
       break;
