@@ -475,6 +475,7 @@ async function tryProcessChildAttachedInLockedCollapsedTree({ child, parent }) {
           tab:  child.id,
         }),
       ]);
+      log('move to ', pinnedTabs.length);
       await browser.tabs.move(child.id, {
         windowId: parent.windowId,
         index:    pinnedTabs.length,
@@ -489,6 +490,7 @@ async function tryProcessChildAttachedInLockedCollapsedTree({ child, parent }) {
           tab:  child.id,
         }),
       ]);
+      log('move to ', tabs.length - 1);
       await browser.tabs.move(child.id, {
         windowId: parent.windowId,
         index:    tabs.length - 1,
