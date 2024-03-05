@@ -486,7 +486,7 @@ async function tryProcessChildAttachedInLockedCollapsedTree({ child, parent }) {
           log('next sibling: ', nextSiblingTab, nextSiblingTab.index);
           await browser.tabs.move(child.id, {
             windowId: parent.windowId,
-            index:    nextSiblingTab.index,
+            index:    nextSiblingTab.index - 1,
           });
         }
         else {
