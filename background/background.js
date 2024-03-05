@@ -7,6 +7,7 @@
 
 import {
   configs,
+  wait,
 } from '/common/common.js';
 
 const TST_ID = 'treestyletab@piro.sakura.ne.jp';
@@ -177,26 +178,12 @@ function onMessageExternal(message, sender) {
 
         case 'try-expand-tree-from-attached-child':
           if (configs.blockExpansionFromAttachedChild &&
+              message.tab.states.includes('subtree-collapsed') &&
               lockedTabs.has(message.tab.id)) {
-            if (message.tab.states.includes('newtab-command-tab') ||
-                message.tab.states.includes('duplicated') ||
-                message.tab.states.includes('restored') ||
-                message.tab.states.includes('from-external') ||
-                message.tab.states.includes('from-firefox-view') ||
-                message.tab.states.includes('opened-for-same-website')) {
-              switch (configs.redirectChildNotFromExistingTabsUnderLockedCollapsedTree) {
-                case 'none':
-                  break;
-
-                case 'independent':
-                  // TODO: move the tab to the end of tabs
-                  break;
-
-                case 'nextsibling':
-                  // TODO: move the tab next to the most nearest expanded ancestor
-                  break;
-              }
-            }
+            tryProcessChildAttachedInLockedCollapsedTree({
+              child:  message.child,
+              parent: message.tab,
+            });
             return Promise.resolve(true);
           }
           break;
@@ -417,6 +404,93 @@ browser.windows.onRemoved.addListener(windowId => {
 browser.tabs.onRemoved.addListener(tabId => {
   lockedTabs.delete(tabId);
 });
+
+async function tryProcessChildAttachedInLockedCollapsedTree({ child, parent }) {
+  console.log('tryProcessChildAttachedInLockedCollapsedTree ', { child, parent });
+  const childStates = new Set(child?.states || []);
+  if (!childStates.has('creating'))
+    return;
+
+  /*
+  if (!(childStates.has('newtab-command-tab') ||
+        childStates.has('duplicated') ||
+        childStates.has('restored') ||
+        childStates.has('from-external') ||
+        childStates.has('from-firefox-view') ||
+        childStates.has('opened-for-same-website')))
+    return;
+  */
+
+  await wait(1000); // TODO: we need to wait until it is completely handled by TST itself. 1000msec is just a workaround until we implement something mecanism to wait until that certainly.
+  switch (configs.redirectChildNotFromExistingTabsUnderLockedCollapsedTree) {
+    case 'none':
+      break;
+
+    case 'independent': {
+      const tabs = await browser.tabs.query({ windowId: parent.windowId });
+      await browser.runtime.sendMessage(TST_ID, {
+        type: 'detach',
+        tab:  child.id,
+      });
+      await browser.tabs.move(child.id, {
+        windowId: parent.windowId,
+        index:    tabs.length-1,
+      });
+    }; break;
+
+    case 'nextsibling': {
+      const [ancestors, nextSiblings] = await Promise.all([
+        browser.runtime.sendMessage(TST_ID, {
+          type: 'get-light-tree',
+          tabs: child.ancestorTabIds,
+        }),
+        browser.runtime.sendMessage(TST_ID, {
+          type: 'get-light-tree',
+          tabs: child.ancestorTabIds.map(id => `nextSibling-of-${id}`),
+        }),
+      ]);
+      for (let i = 0, maxi = ancestors.length; i < maxi; i++) {
+        const ancestor = ancestors[i];
+        const nextSibling = nextSiblings[i];
+        if (ancestor.states.includes('collapsed'))
+          continue;
+        if (ancestor.ancestorTabIds[0]) {
+          await browser.runtime.sendMessage(TST_ID, {
+            type: 'attach',
+            parent: ancestor.ancestorTabIds[0],
+            child:  child.id,
+            insertBefore: nextSibling?.id,
+          });
+        }
+        else if (nextSibling) {
+          const [nextSiblingTab] = await Promise.all([
+            browser.tabs.get(nextSibling.id),
+            browser.runtime.sendMessage(TST_ID, {
+              type: 'detach',
+              tab:  child.id,
+            }),
+          ]);
+          await browser.tabs.move(child.id, {
+            windowId: parent.windowId,
+            index:    nextSiblingTab.index,
+          });
+        }
+        else {
+          const tabs = await browser.tabs.query({ windowId: parent.windowId });
+          await browser.runtime.sendMessage(TST_ID, {
+            type: 'detach',
+            tab:  child.id,
+          });
+          await browser.tabs.move(child.id, {
+            windowId: child.windowId,
+            index:    tabs.length-1,
+          });
+        }
+        break;
+      }
+    }; break;
+  }
+}
 
 function reserveToProcessMovedTabs() {
   if (reserveToProcessMovedTabs.reserved)
