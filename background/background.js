@@ -467,15 +467,31 @@ async function tryProcessChildAttachedInLockedCollapsedTree({ child, parent }) {
     case 'none':
       break;
 
-    case 'independent': {
-      const tabs = await browser.tabs.query({ windowId: parent.windowId });
-      await browser.runtime.sendMessage(TST_ID, {
-        type: 'detach',
-        tab:  child.id,
-      });
+    case 'top': {
+      const [pinnedTabs] = await Promise.all([
+        browser.tabs.query({ windowId: parent.windowId, pinned: true }),
+        browser.runtime.sendMessage(TST_ID, {
+          type: 'detach',
+          tab:  child.id,
+        }),
+      ]);
       await browser.tabs.move(child.id, {
         windowId: parent.windowId,
-        index:    tabs.length-1,
+        index:    pinnedTabs.length,
+      });
+    }; break;
+
+    case 'end': {
+      const [tabs] = await Promise.all([
+        browser.tabs.query({ windowId: parent.windowId }),
+        browser.runtime.sendMessage(TST_ID, {
+          type: 'detach',
+          tab:  child.id,
+        }),
+      ]);
+      await browser.tabs.move(child.id, {
+        windowId: parent.windowId,
+        index:    tabs.length - 1,
       });
     }; break;
 
