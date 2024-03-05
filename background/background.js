@@ -497,7 +497,7 @@ async function tryProcessChildAttachedInLockedCollapsedTree({ child, parent }) {
           });
           await browser.tabs.move(child.id, {
             windowId: child.windowId,
-            index:    tabs.length-1,
+            index:    tabs.length - 1,
           });
         }
         break;
