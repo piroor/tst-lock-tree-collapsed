@@ -59,8 +59,10 @@ async function registerToTST() {
       listeningTypes.push('try-expand-tree-from-focused-parent');
     if (configs.blockExpansionFromFocusedBundledParent)
       listeningTypes.push('try-expand-tree-from-focused-bundled-parent');
-    if (configs.blockExpansionFromAttachedChild)
+    if (configs.blockExpansionFromAttachedChild) {
       listeningTypes.push('try-expand-tree-from-attached-child');
+      listeningTypes.push('new-tab-processed');
+    }
     if (configs.blockExpansionFromLongPressCtrlKey)
       listeningTypes.push('try-expand-tree-from-long-press-ctrl-key');
     if (configs.blockExpansionFromEndTabSwitch)
@@ -141,6 +143,7 @@ configs.$addObserver(key => {
 
 let lastRedirectedParent;
 let mMovedTabsInfo = [];
+const mWaitingProcessedTabsResolvers = new Map();
 
 function onMessageExternal(message, sender) {
   switch (sender.id) {
@@ -191,6 +194,16 @@ function onMessageExternal(message, sender) {
             return Promise.resolve(true);
           }
           break;
+
+        case 'new-tab-processed': {
+          const resolvers = mWaitingProcessedTabsResolvers.get(message.tab.id);
+          mWaitingProcessedTabsResolvers.delete(message.tab.id);
+          if (resolvers) {
+            for (const resolver of resolvers) {
+              resolver();
+            }
+          }
+        }; break;
 
         case 'try-expand-tree-from-long-press-ctrl-key':
           log(message.type, { message, locked: lockedTabs.has(message.tab.id) });
@@ -424,7 +437,12 @@ async function tryProcessChildAttachedInLockedCollapsedTree({ child, parent }) {
 
   const wasActive = (await browser.tabs.get(child.id)).active;
 
-  await wait(1000); // TODO: we need to wait until it is completely handled by TST itself. 1000msec is just a workaround until we implement something mecanism to wait until that certainly.
+  const resolvers = mWaitingProcessedTabsResolvers.get(child.id) || [];
+  const promisedProcessed = new Promise((resolve, _reject) => {
+    resolvers.push(resolve);
+    mWaitingProcessedTabsResolvers.set(child.id, resolvers);
+  });
+  await promisedProcessed;
 
   // to get finally detected states
   child = await browser.runtime.sendMessage(TST_ID, { type: 'get-light-tree', tab: child.id });
