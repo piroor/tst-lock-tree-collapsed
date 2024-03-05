@@ -7,7 +7,6 @@
 
 import {
   configs,
-  wait,
   log,
 } from '/common/common.js';
 
