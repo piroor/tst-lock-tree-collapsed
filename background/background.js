@@ -7,6 +7,7 @@
 
 import {
   configs,
+  wait,
   log,
 } from '/common/common.js';
 
@@ -283,6 +284,7 @@ function onMessageExternal(message, sender) {
           break;
 
         case 'try-redirect-focus-from-collaped-tab':
+          log(message.type, { message });
           return (async () => {
             const [treeTabs, willCancel] = await Promise.all([
               browser.runtime.sendMessage(TST_ID, {
@@ -312,6 +314,7 @@ function onMessageExternal(message, sender) {
             lastRedirectedParent = nearestLockedCollapsedAncestor.id;
             // immediate refocus may cause unhighlighted active tab on TS...
             setTimeout(() => {
+              log('redirect focus');
               browser.tabs.update(
                 message.focusDirection < 0 ?
                   previousVisible.id :
@@ -326,6 +329,7 @@ function onMessageExternal(message, sender) {
           })();
 
         case 'try-fixup-tree-on-tab-moved':
+          log(message.type, { message });
           if (message.tab.active && // Ignore moves on non-active tabs
               Math.abs(message.fromIndex - message.toIndex) == 1 && // process only move-up or move-down
               message.parent &&
@@ -442,6 +446,9 @@ async function tryProcessChildAttachedInLockedCollapsedTree({ child, parent }) {
     mWaitingProcessedTabsResolvers.set(child.id, resolvers);
   });
   await promisedProcessed;
+
+  // wait until tab move by TST finishes
+  await wait(configs.redirectChildNotFromExistingTabsUnderLockedCollapsedTreeDelayMsec);
 
   // to get finally detected states
   child = await browser.runtime.sendMessage(TST_ID, { type: 'get-light-tree', tab: child.id });

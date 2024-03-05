@@ -18,6 +18,7 @@ export const configs = new Configs({
   blockExpansionFromFocusedBundledParent: true,
   blockExpansionFromAttachedChild:        true,
   redirectChildNotFromExistingTabsUnderLockedCollapsedTree: 'none',
+  redirectChildNotFromExistingTabsUnderLockedCollapsedTreeDelayMsec: 100,
   blockExpansionFromLongPressCtrlKey:     true,
   blockExpansionFromEndTabSwitch:         true,
   blockExpansionFromFocusedCollapsedTab:  true,
@@ -33,6 +34,26 @@ export const configs = new Configs({
     'debug',
   ]
 });
+
+export async function wait(task = 0, timeout = 0) {
+  if (typeof task != 'function') {
+    timeout = task;
+    task    = null;
+  }
+  return new Promise((resolve, _reject) => {
+    setTimeout(async () => {
+      if (task)
+        await task();
+      resolve();
+    }, timeout);
+  });
+}
+
+export function nextFrame() {
+  return new Promise((resolve, _reject) => {
+    window.requestAnimationFrame(resolve);
+  });
+}
 
 export function log(...args)
 {
