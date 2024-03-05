@@ -422,6 +422,8 @@ async function tryProcessChildAttachedInLockedCollapsedTree({ child, parent }) {
   if (child && !child.states.includes('creating'))
     return;
 
+  const wasActive = (await browser.tabs.get(child.id)).active;
+
   await wait(1000); // TODO: we need to wait until it is completely handled by TST itself. 1000msec is just a workaround until we implement something mecanism to wait until that certainly.
 
   // to get finally detected states
@@ -507,6 +509,9 @@ async function tryProcessChildAttachedInLockedCollapsedTree({ child, parent }) {
       }
     }; break;
   }
+
+  if (wasActive)
+    browser.tabs.update(child.id, { active: true });
 }
 
 function reserveToProcessMovedTabs() {
