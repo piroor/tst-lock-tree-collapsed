@@ -461,7 +461,7 @@ async function tryProcessChildAttachedInLockedCollapsedTree({ child, parent }) {
           tabs: child.ancestorTabIds.map(id => `nextSibling-of-${id}`),
         }),
       ]);
-      log({ ancestors, nextSiblings });
+      log('redirect to next sibling ', { ancestors, nextSiblings });
       for (let i = 0, maxi = ancestors.length; i < maxi; i++) {
         const ancestor = ancestors[i];
         const nextSibling = nextSiblings[i];
