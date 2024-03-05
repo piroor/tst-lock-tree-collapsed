@@ -30,5 +30,9 @@
   "config_blockCollapsion_caption":                     { "message": "状態をロックしたツリーは以下の場面で自動的に折りたたまない" },
   "config_blockCollapsionFromOtherExpansion_label":     { "message": "他のツリーが展開されたとき" },
   "config_blockCollapsionFromCollapseCommand_label":    { "message": "「このツリーをたたむ」コマンド実行時（コマンド実行対象となった最上位の親を除く）" },
-  "config_blockCollapsionFromCollapseAllCommand_label": { "message": "「すべてのツリーをたたむ」コマンド実行時" }
+  "config_blockCollapsionFromCollapseAllCommand_label": { "message": "「すべてのツリーをたたむ」コマンド実行時" },
+
+  "config_debug_caption": { "message": "開発用" },
+  "config_debug_label": { "message": "デバッグモード" },
+  "config_all_caption": { "message": "すべての設定" }
 }

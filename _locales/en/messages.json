@@ -30,5 +30,9 @@
   "config_blockCollapsion_caption":                     { "message": "Don't collapse locked tree automatically when" },
   "config_blockCollapsionFromOtherExpansion_label":     { "message": "Any other tree is expanded" },
   "config_blockCollapsionFromCollapseCommand_label":    { "message": "\"Collapse this Tree\" command (except the top level parent the command is invoked)" },
-  "config_blockCollapsionFromCollapseAllCommand_label": { "message": "\"Collapse All Trees\" command" }
+  "config_blockCollapsionFromCollapseAllCommand_label": { "message": "\"Collapse All Trees\" command" },
+
+  "config_debug_caption": { "message": "Development" },
+  "config_debug_label": { "message": "Debug mode" },
+  "config_all_caption": { "message": "All Configs" }
 }

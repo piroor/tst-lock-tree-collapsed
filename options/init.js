@@ -11,9 +11,8 @@ import {
 import Options from '/extlib/Options.js';
 import '/extlib/l10n.js';
 
-/*const options = */new Options(configs);
+const options = new Options(configs);
 
-/*
 function onConfigChanged(key) {
   switch (key) {
     case 'debug':
@@ -26,13 +25,12 @@ function onConfigChanged(key) {
 }
 
 configs.$addObserver(onConfigChanged);
-*/
 
 window.addEventListener('DOMContentLoaded', async () => {
   await configs.$loaded;
 
-  //options.buildUIForAllConfigs(document.querySelector('#debug-configs'));
-  //onConfigChanged('debug');
+  options.buildUIForAllConfigs(document.querySelector('#debug-configs'));
+  onConfigChanged('debug');
 
   document.documentElement.classList.add('initialized');
 }, { once: true });

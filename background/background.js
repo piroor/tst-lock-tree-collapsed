@@ -8,6 +8,7 @@
 import {
   configs,
   wait,
+  log,
 } from '/common/common.js';
 
 const TST_ID = 'treestyletab@piro.sakura.ne.jp';
@@ -164,6 +165,7 @@ function onMessageExternal(message, sender) {
           break;
 
         case 'try-expand-tree-from-focused-parent':
+          log(message.type, { message, lastRedirectedParent, locked: lockedTabs.has(message.tab.id) });
           if ((configs.blockExpansionFromFocusedParent ||
                lastRedirectedParent == message.tab.id) &&
               lockedTabs.has(message.tab.id))
@@ -171,12 +173,14 @@ function onMessageExternal(message, sender) {
           break;
 
         case 'try-expand-tree-from-focused-bundled-parent':
+          log(message.type, { message, locked: lockedTabs.has(message.tab.id) });
           if (configs.blockExpansionFromFocusedBundledParent &&
               lockedTabs.has(message.tab.id))
             return Promise.resolve(true);
           break;
 
         case 'try-expand-tree-from-attached-child':
+          log(message.type, { message, locked: lockedTabs.has(message.tab.id) });
           if (configs.blockExpansionFromAttachedChild &&
               message.tab.states.includes('subtree-collapsed') &&
               lockedTabs.has(message.tab.id)) {
@@ -189,18 +193,21 @@ function onMessageExternal(message, sender) {
           break;
 
         case 'try-expand-tree-from-long-press-ctrl-key':
+          log(message.type, { message, locked: lockedTabs.has(message.tab.id) });
           if (configs.blockExpansionFromLongPressCtrlKey &&
               lockedTabs.has(message.tab.id))
             return Promise.resolve(true);
           break;
 
         case 'try-expand-tree-from-end-tab-switch':
+          log(message.type, { message, locked: lockedTabs.has(message.tab.id) });
           if (configs.blockExpansionFromEndTabSwitch &&
               lockedTabs.has(message.tab.id))
             return Promise.resolve(true);
           break;
 
         case 'try-expand-tree-from-focused-collapsed-tab':
+          log(message.type, { message, locked: lockedTabs.has(message.tab.id) });
           if (!configs.blockExpansionFromFocusedCollapsedTab)
             return;
           return (async () => {
@@ -217,6 +224,7 @@ function onMessageExternal(message, sender) {
           })();
 
         case 'try-expand-tree-from-expand-command':
+          log(message.type, { message, locked: lockedTabs.has(message.tab.id) });
           if (configs.blockExpansionFromExpandCommand &&
               message.recursivelyExpanded &&
               lockedTabs.has(message.tab.id))
@@ -224,12 +232,14 @@ function onMessageExternal(message, sender) {
           break;
 
         case 'try-expand-tree-from-expand-all-command':
+          log(message.type, { message, locked: lockedTabs.has(message.tab.id) });
           if (configs.blockExpansionFromExpandAllCommand &&
               lockedTabs.has(message.tab.id))
             return Promise.resolve(true);
           break;
 
         case 'try-collapse-tree-from-other-expansion':
+          log(message.type, { message, locked: lockedTabs.has(message.tab.id) });
           if (!configs.blockCollapsionFromOtherExpansion)
             return;
           return (async () => {
@@ -246,6 +256,7 @@ function onMessageExternal(message, sender) {
           })();
 
         case 'try-collapse-tree-from-collapse-command':
+          log(message.type, { message, locked: lockedTabs.has(message.tab.id) });
           if (configs.blockCollapsionFromCollapseCommand &&
               message.recursivelyCollapsed &&
               lockedTabs.has(message.tab.id))
@@ -253,6 +264,7 @@ function onMessageExternal(message, sender) {
           break;
 
         case 'try-collapse-tree-from-collapse-all-command':
+          log(message.type, { message, locked: lockedTabs.has(message.tab.id) });
           if (configs.blockCollapsionFromCollapseAllCommand &&
               lockedTabs.has(message.tab.id))
             return Promise.resolve(true);
@@ -406,7 +418,7 @@ browser.tabs.onRemoved.addListener(tabId => {
 });
 
 async function tryProcessChildAttachedInLockedCollapsedTree({ child, parent }) {
-  console.log('tryProcessChildAttachedInLockedCollapsedTree ', { child, parent });
+  log('tryProcessChildAttachedInLockedCollapsedTree ', { child, parent });
   const childStates = new Set(child?.states || []);
   if (!childStates.has('creating'))
     return;
@@ -449,6 +461,7 @@ async function tryProcessChildAttachedInLockedCollapsedTree({ child, parent }) {
           tabs: child.ancestorTabIds.map(id => `nextSibling-of-${id}`),
         }),
       ]);
+      log({ ancestors, nextSiblings });
       for (let i = 0, maxi = ancestors.length; i < maxi; i++) {
         const ancestor = ancestors[i];
         const nextSibling = nextSiblings[i];
@@ -470,6 +483,7 @@ async function tryProcessChildAttachedInLockedCollapsedTree({ child, parent }) {
               tab:  child.id,
             }),
           ]);
+          log('next sibling: ', nextSiblingTab, nextSiblingTab.index);
           await browser.tabs.move(child.id, {
             windowId: parent.windowId,
             index:    nextSiblingTab.index,
@@ -508,7 +522,7 @@ async function processMovedTabs() {
   // https://github.com/piroor/tst-lock-tree-collapsed/issues/10
   const movedTabsInfo = mMovedTabsInfo;
   mMovedTabsInfo = [];
-  console.log(movedTabsInfo);
+  log('processMovedTabs ', movedTabsInfo);
 
   const tabIds    = movedTabsInfo.map(info => info.id);
   const tabIdsSet = new Set(tabIds);
@@ -530,7 +544,7 @@ async function processMovedTabs() {
   const rootTabs = tabs.filter(tab => tab.ancestorTabIds.every(id => !tabIdsSet.has(id)));
   for (const rootTab of rootTabs) {
     if ((rootTab.fromIndex - rootTab.toIndex) == 1) {
-      //console.log('move up ', { rootTab });
+      log('move up ', { rootTab });
       await browser.runtime.sendMessage(TST_ID, {
         type:           'move-before',
         tab:            rootTab.id,
@@ -540,10 +554,10 @@ async function processMovedTabs() {
       browser.tabs.update(rootTab.id, { active: true });
     }
     else if ((rootTab.toIndex - rootTab.fromIndex) == 1) {
-      //console.log('move down ', { rootTab });
+      log('move down ', { rootTab });
       const lastDescendantId = getLastDescendantOrSelfId(rootTab.nearestVisibleParent);
       if (rootTab.nearestVisibleParent.ancestorTabIds.length > 0) {
-        //console.log(' => reattach to the parennt ', rootTab.nearestVisibleParent.ancestorTabIds[0]);
+        log(' => reattach to the parennt ', rootTab.nearestVisibleParent.ancestorTabIds[0]);
         await browser.runtime.sendMessage(TST_ID, {
           type:        'attach',
           parent:      rootTab.nearestVisibleParent.ancestorTabIds[0],
@@ -552,7 +566,7 @@ async function processMovedTabs() {
         });
       }
       else {
-        //console.log(' => detach from tree');
+        log(' => detach from tree');
         await browser.runtime.sendMessage(TST_ID, {
           type:           'move-after',
           tab:            rootTab.id,

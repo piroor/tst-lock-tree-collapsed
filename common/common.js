@@ -26,8 +26,11 @@ export const configs = new Configs({
   blockCollapsionFromOtherExpansion:      false,
   blockCollapsionFromCollapseCommand:     false,
   blockCollapsionFromCollapseAllCommand:  false,
+
+  debug: false,
 }, {
   localKeys: [
+    'debug',
   ]
 });
 
@@ -49,4 +52,23 @@ export function nextFrame() {
   return new Promise((resolve, _reject) => {
     window.requestAnimationFrame(resolve);
   });
+}
+
+export function log(...args)
+{
+  if (!configs.debug)
+    return;
+
+  const message = args.shift();
+
+  args = args.map(arg => typeof arg == 'function' ? arg() : arg);
+
+  const nest = (new Error()).stack.split('\n').length;
+  let indent = '';
+  for (let i = 0; i < nest; i++) {
+    indent += ' ';
+  }
+
+  const line = `${indent}${message}`;
+  console.log(line, ...args);
 }
