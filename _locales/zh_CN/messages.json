@@ -15,9 +15,21 @@
         "message": "锁定为折叠状态(&K)",
         "hash": "8c3cec70f930b28512423f7a5b5afd24"
     },
-    "config_context_lockCollapsed_label": {
-        "message": "在标签页上下文菜单中显示附加的 “锁定为折叠状态” 命令",
-        "hash": "d14beb615c62119ae79265a8f7a115eb"
+    "command_expandExceptLocked": {
+        "message": "展开此标签树（排除锁定项）",
+        "hash": "16250de71aba7e5786768b778152e45f"
+    },
+    "context_expandExceptLocked_label": {
+        "message": "展开此标签树（排除锁定项）(&E)",
+        "hash": "bf2bff01ed737b34ae0ffd7055b77bb7"
+    },
+    "command_expandAllExceptLocked": {
+        "message": "展开全部（排除锁定项）",
+        "hash": "e5f9465528aaa2d63a1f3f431f1eccdf"
+    },
+    "context_expandAllExceptLocked_label": {
+        "message": "展开全部（排除锁定项）(&A)",
+        "hash": "f02838ed4c275019b5838756218975ed"
     },
     "config_toggleByDblClick_label": {
         "message": "通过双击开关对一个标签树的锁定",
@@ -27,9 +39,25 @@
         "message": "默认锁定所有标签树",
         "hash": "8d0ed2700fa86e6faa521f6f131b9eb6"
     },
+    "config_context_caption": {
+        "message": "在标签页上下文菜单中附加命令项",
+        "hash": "7d4eda831b8277a7ab35dc22337c1e71"
+    },
+    "config_context_lockCollapsed_label": {
+        "message": "锁定为折叠状态",
+        "hash": "ffc31da795a8fb62b31f9eb8a0744160"
+    },
+    "config_context_expandExceptLocked_label": {
+        "message": "展开此标签树（排除锁定项）",
+        "hash": "16250de71aba7e5786768b778152e45f"
+    },
+    "config_context_expandAllExceptLocked_label": {
+        "message": "展开全部（排除锁定项）",
+        "hash": "e5f9465528aaa2d63a1f3f431f1eccdf"
+    },
     "config_blockExpansion_caption": {
-        "message": "不要在该情况下自动展开标签树",
-        "hash": "63ef4e2093e808bdcb0d518b37765fb7"
+        "message": "不要在该情况下自动展开已锁定的标签树",
+        "hash": "5b71ac8c11a6bd7459a7f86bcabef089"
     },
     "config_blockExpansionFromFocusedParent_label": {
         "message": "父标签页被聚焦时",
@@ -43,8 +71,28 @@
         "message": "附加一个子标签页时",
         "hash": "7ced0cc5b9373ba40a1fdb8ea3774a0d"
     },
+    "config_redirectChildNotFromExistingTabsUnderLockedCollapsedTree_caption": {
+        "message": "挽救 附加到锁定-折叠树中的标签页，尽管这些标签页不是从父标签页打开的",
+        "hash": "43a0f44b27c0e875f6e2d9cdc71306c7"
+    },
+    "config_redirectChildNotFromExistingTabsUnderLockedCollapsedTree_none_label": {
+        "message": "什么都不做（在已折叠的标签树下保持显示）",
+        "hash": "c74245567f39253b93a11b5049109b68"
+    },
+    "config_redirectChildNotFromExistingTabsUnderLockedCollapsedTree_nextsibling_label": {
+        "message": "移动到父标签页的右邻同级位置",
+        "hash": "bff1d67e22198ac1793a620549a67b30"
+    },
+    "config_redirectChildNotFromExistingTabsUnderLockedCollapsedTree_top_label": {
+        "message": "移动到所有标签页顶部",
+        "hash": "e8a20a37b5f321e21d62bfa5a6015b62"
+    },
+    "config_redirectChildNotFromExistingTabsUnderLockedCollapsedTree_end_label": {
+        "message": "移动到所有标签页尾部",
+        "hash": "d12fc5ea889b7b83e9a4633ad18781f4"
+    },
     "config_blockExpansionFromFocusedCollapsedTab_label": {
-        "message": "折叠（不可见）标签页被聚焦时",
+        "message": "已折叠（不可见的）标签页被聚焦时",
         "hash": "b74954df75baff32b84a9a4108a5727d"
     },
     "config_blockExpansionFromLongPressCtrlKey_label": {
@@ -55,6 +103,42 @@
         "message": "通过 Ctrl-Tab 或者 Ctrl-Shift-Tab 进行标签页切换后",
         "hash": "4e2e23e6605868d229adb0bff572c9c7"
     },
+    "config_blockExpansionFromExpandCommand_label": {
+        "message": "执行 \"折叠此标签树\" 命令时（除非是在顶层父项执行该命令）",
+        "hash": "50e1e79850f8d4d220a443287f7436c2"
+    },
+    "config_blockExpansionFromExpandAllCommand_label": {
+        "message": "执行 \"展开全部标签树\" 命令时",
+        "hash": "679afeafe8763d0cdfd831b502780ecf"
+    },
+    "config_blockCollapsion_caption": {
+        "message": "不要在该情况下自动折叠已锁定的标签树",
+        "hash": "d976459f28a909fc6b2ebc00f73297dc"
+    },
+    "config_blockCollapsionFromOtherExpansion_label": {
+        "message": "有其它标签树处于展开状态时",
+        "hash": "82caea793b92d1befaf4ac6f3291f990"
+    },
+    "config_blockCollapsionFromCollapseCommand_label": {
+        "message": "执行 \"折叠此标签树\" 命令时（除非是在顶层父项执行该命令）",
+        "hash": "ce46105b63aa10e537a7b8df2c55b2a1"
+    },
+    "config_blockCollapsionFromCollapseAllCommand_label": {
+        "message": "执行 \"折叠全部标签树\" 命令时",
+        "hash": "9d544320dcea042d272f9a249edf65d4"
+    },
+    "config_debug_caption": {
+        "message": "开发",
+        "hash": "af84c3ce90181048c533886621f00ac2"
+    },
+    "config_debug_label": {
+        "message": "调试模式",
+        "hash": "09b9b4dc690b71222315f1191f9a1d1b"
+    },
+    "config_all_caption": {
+        "message": "全部配置",
+        "hash": "e0437bb7bd8d7ce28700078c6bb12418"
+    },
 
-    "__WET_LOCALE__": { "message": "zh-CN" }
+    "__WET_LOCALE__": { "message": "zh_CN" }
 }
