@@ -122,7 +122,7 @@ export async function getTSTVersion() {
     case WS_ID:
       // WS 0.1-1.0 are corresponding to TST 4.x
       const majorAndMinor = version.match(/^(\d+)\.(\d+)/);
-      return Math.ceil(parseFloat(majorAndMinor)) + 3;
+      return String(Math.ceil(parseFloat(majorAndMinor)) + 3);
   }
-  return 0;
+  return '0.0';
 }
