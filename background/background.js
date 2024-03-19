@@ -9,9 +9,11 @@ import {
   configs,
   wait,
   log,
+  TST_ID,
+  WS_ID,
+  callTSTAPI,
+  getTSTVersion,
 } from '/common/common.js';
-
-const TST_ID = 'treestyletab@piro.sakura.ne.jp';
 
 const KEY_LOCKED_COLLAPSED = 'tst-lock-tree-collapsed-locked-collapsed';
 
@@ -81,8 +83,8 @@ async function registerToTST() {
       listeningTypes.push('try-collapse-tree-from-collapse-all-command');
 
     const [TSTVersion] = await Promise.all([
-      browser.runtime.sendMessage(TST_ID, { type: 'get-version' }),
-      browser.runtime.sendMessage(TST_ID, {
+      getTSTVersion(),
+      callTSTAPI({
         type: 'register-self',
         name: browser.i18n.getMessage('extensionName'),
         //icons: browser.runtime.getManifest().icons,
@@ -108,7 +110,7 @@ async function registerToTST() {
     }
 
     for (const params of Object.values(menuItemDefinitions)) {
-      browser.runtime.sendMessage(TST_ID, {
+      callTSTAPI({
         type: 'fake-contextMenu-create',
         params,
       });
@@ -133,7 +135,7 @@ configs.$addObserver(key => {
     case 'blockCollapsionFromOtherExpansion':
     case 'blockCollapsionFromCollapseCommand':
     case 'blockCollapsionFromCollapseAllCommand':
-      browser.runtime.sendMessage(TST_ID, { type: 'unregister-self' }).then(registerToTST);
+      callTSTAPI({ type: 'unregister-self' }).then(registerToTST);
       break;
 
     default:
@@ -148,6 +150,7 @@ const mWaitingProcessedTabsResolvers = new Map();
 function onMessageExternal(message, sender) {
   switch (sender.id) {
     case TST_ID:
+    case WS_ID:
       if (message && message.messages) {
         for (const oneMessage of message.messages) {
           onMessageExternal(oneMessage, sender);
@@ -224,7 +227,7 @@ function onMessageExternal(message, sender) {
           if (!configs.blockExpansionFromFocusedCollapsedTab)
             return;
           return (async () => {
-            const lockedCollapsedAncestors = await browser.runtime.sendMessage(TST_ID, {
+            const lockedCollapsedAncestors = await callTSTAPI({
               type: mGetTreeType,
               tabs: message.tab.ancestorTabIds.filter(id => lockedTabs.has(id)),
             });
@@ -256,7 +259,7 @@ function onMessageExternal(message, sender) {
           if (!configs.blockCollapsionFromOtherExpansion)
             return;
           return (async () => {
-            const lockedExpandedTabs = await browser.runtime.sendMessage(TST_ID, {
+            const lockedExpandedTabs = await callTSTAPI({
               type: mGetTreeType,
               tabs: message.tab.ancestorTabIds.filter(id => lockedTabs.has(id))
             });
@@ -287,7 +290,7 @@ function onMessageExternal(message, sender) {
           log(message.type, { message });
           return (async () => {
             const [treeTabs, willCancel] = await Promise.all([
-              browser.runtime.sendMessage(TST_ID, {
+              callTSTAPI({
                 type: mGetTreeType,
                 tabs: ['nextVisibleCyclic', 'previousVisibleCyclic']
                   .concat(message.tab.ancestorTabIds.filter(id => lockedTabs.has(id)))
@@ -336,7 +339,7 @@ function onMessageExternal(message, sender) {
               (lockedTabs.has(message.parent.id) ||
                message.parent.ancestorTabIds.some(id => lockedTabs.has(id)))) {
             return (async () => {
-              const ancestors = [message.parent].concat(await browser.runtime.sendMessage(TST_ID, {
+              const ancestors = [message.parent].concat(await callTSTAPI({
                 type: mGetTreeType,
                 tabs: message.parent.ancestorTabIds
               }));
@@ -374,7 +377,7 @@ function onMessageExternal(message, sender) {
               !configs.toggleByDblClick)
             return;
           return (async () => {
-            const treeItem = await browser.runtime.sendMessage(TST_ID, {
+            const treeItem = await callTSTAPI({
               type: mGetTreeType,
               tab:  message.tab.id
             });
@@ -383,7 +386,7 @@ function onMessageExternal(message, sender) {
             toggleTabLocked(treeItem.id);
             /*
             if (lockedTabs.has(treeItem.id)) {
-              browser.runtime.sendMessage(TST_ID, {
+              callTSTAPI({
                 type: 'collapse-tree',
                 tab:  treeItem.id
               });
@@ -451,7 +454,7 @@ async function tryProcessChildAttachedInLockedCollapsedTree({ child, parent }) {
   await wait(configs.redirectChildNotFromExistingTabsUnderLockedCollapsedTreeDelayMsec);
 
   // to get finally detected states
-  child = await browser.runtime.sendMessage(TST_ID, { type: 'get-light-tree', tab: child.id });
+  child = await callTSTAPI({ type: 'get-light-tree', tab: child.id });
 
   const childStates = new Set(child.states);
   log('states: ', childStates);
@@ -470,7 +473,7 @@ async function tryProcessChildAttachedInLockedCollapsedTree({ child, parent }) {
     case 'top': {
       const [pinnedTabs] = await Promise.all([
         browser.tabs.query({ windowId: parent.windowId, pinned: true }),
-        browser.runtime.sendMessage(TST_ID, {
+        callTSTAPI({
           type: 'detach',
           tab:  child.id,
         }),
@@ -485,7 +488,7 @@ async function tryProcessChildAttachedInLockedCollapsedTree({ child, parent }) {
     case 'end': {
       const [tabs] = await Promise.all([
         browser.tabs.query({ windowId: parent.windowId }),
-        browser.runtime.sendMessage(TST_ID, {
+        callTSTAPI({
           type: 'detach',
           tab:  child.id,
         }),
@@ -499,11 +502,11 @@ async function tryProcessChildAttachedInLockedCollapsedTree({ child, parent }) {
 
     case 'nextsibling': {
       const [ancestors, nextSiblings] = await Promise.all([
-        browser.runtime.sendMessage(TST_ID, {
+        callTSTAPI({
           type: 'get-light-tree',
           tabs: child.ancestorTabIds,
         }),
-        browser.runtime.sendMessage(TST_ID, {
+        callTSTAPI({
           type: 'get-light-tree',
           tabs: child.ancestorTabIds.map(id => `nextSibling-of-${id}`),
         }),
@@ -515,7 +518,7 @@ async function tryProcessChildAttachedInLockedCollapsedTree({ child, parent }) {
         if (ancestor.states.includes('collapsed'))
           continue;
         if (ancestor.ancestorTabIds[0]) {
-          await browser.runtime.sendMessage(TST_ID, {
+          await callTSTAPI({
             type: 'attach',
             parent: ancestor.ancestorTabIds[0],
             child:  child.id,
@@ -525,7 +528,7 @@ async function tryProcessChildAttachedInLockedCollapsedTree({ child, parent }) {
         else if (nextSibling) {
           const [nextSiblingTab] = await Promise.all([
             browser.tabs.get(nextSibling.id),
-            browser.runtime.sendMessage(TST_ID, {
+            callTSTAPI({
               type: 'detach',
               tab:  child.id,
             }),
@@ -538,7 +541,7 @@ async function tryProcessChildAttachedInLockedCollapsedTree({ child, parent }) {
         }
         else {
           const tabs = await browser.tabs.query({ windowId: parent.windowId });
-          await browser.runtime.sendMessage(TST_ID, {
+          await callTSTAPI({
             type: 'detach',
             tab:  child.id,
           });
@@ -576,7 +579,7 @@ async function processMovedTabs() {
 
   const tabIds    = movedTabsInfo.map(info => info.id);
   const tabIdsSet = new Set(tabIds);
-  const tabs      = await browser.runtime.sendMessage(TST_ID, {
+  const tabs      = await callTSTAPI({
     type: mGetTreeType,
     tabs: tabIds,
   });
@@ -595,7 +598,7 @@ async function processMovedTabs() {
   for (const rootTab of rootTabs) {
     if ((rootTab.fromIndex - rootTab.toIndex) == 1) {
       log('move up ', { rootTab });
-      await browser.runtime.sendMessage(TST_ID, {
+      await callTSTAPI({
         type:           'move-before',
         tab:            rootTab.id,
         referenceTabId: rootTab.nearestVisibleParent.id,
@@ -608,7 +611,7 @@ async function processMovedTabs() {
       const lastDescendantId = getLastDescendantOrSelfId(rootTab.nearestVisibleParent);
       if (rootTab.nearestVisibleParent.ancestorTabIds.length > 0) {
         log(' => reattach to the parennt ', rootTab.nearestVisibleParent.ancestorTabIds[0]);
-        await browser.runtime.sendMessage(TST_ID, {
+        await callTSTAPI({
           type:        'attach',
           parent:      rootTab.nearestVisibleParent.ancestorTabIds[0],
           child:       rootTab.id,
@@ -617,13 +620,13 @@ async function processMovedTabs() {
       }
       else {
         log(' => detach from tree');
-        await browser.runtime.sendMessage(TST_ID, {
+        await callTSTAPI({
           type:           'move-after',
           tab:            rootTab.id,
           referenceTabId: lastDescendantId,
           followChildren: true
         });
-        await browser.runtime.sendMessage(TST_ID, {
+        await callTSTAPI({
           type: 'detach',
           tab:  rootTab.id
         });
@@ -667,7 +670,7 @@ async function onMenuShown(info, tab) {
     }
     if (Object.keys(updateParams).length > 0) {
       updates.push(browser.menus.update(params.id, updateParams));
-      browser.runtime.sendMessage(TST_ID, {
+      callTSTAPI({
         type:   'fake-contextMenu-update',
         params: [params.id, updateParams]
       });
@@ -723,7 +726,7 @@ function toggleCollapsed(activeTab, tabs) {
 }
 
 async function appendTreeInfo(tabs) {
-  const treeItems = await browser.runtime.sendMessage(TST_ID, {
+  const treeItems = await callTSTAPI({
     type: mGetTreeType,
     tabs: tabs.map(tab => tab.id),
   });
@@ -752,7 +755,7 @@ function extractExpandableTreeItems(treeItems) {
 
 async function expandExceptLocked(tabs) {
   const treeItems = flattenTreeItems(await appendTreeInfo(tabs));
-  browser.runtime.sendMessage(TST_ID, {
+  callTSTAPI({
     type: 'expand-tree',
     tabs: extractExpandableTreeItems(treeItems).map(treeItem => treeItem.id),
   });
@@ -764,7 +767,7 @@ async function expandAllExceptLocked(windowId) {
     hidden: false,
   });
   const treeItems = await appendTreeInfo(tabs);
-  browser.runtime.sendMessage(TST_ID, {
+  callTSTAPI({
     type: 'expand-tree',
     tabs: extractExpandableTreeItems(treeItems).map(treeItem => treeItem.id),
   });
@@ -818,7 +821,7 @@ function lockTab(id, { restore } = {}) {
     reserveBulkLockUnlockToRestore();
     return;
   }
-  browser.runtime.sendMessage(TST_ID, {
+  callTSTAPI({
     type:  'add-tab-state',
     tabs:  [id],
     state: [KEY_LOCKED_COLLAPSED]
@@ -835,7 +838,7 @@ function unlockTab(id, { restore } = {}) {
     reserveBulkLockUnlockToRestore();
     return;
   }
-  browser.runtime.sendMessage(TST_ID, {
+  callTSTAPI({
     type:  'remove-tab-state',
     tabs:  [id],
     state: [KEY_LOCKED_COLLAPSED]
@@ -856,13 +859,13 @@ function reserveBulkLockUnlockToRestore() {
     mToBeUnlockedTabIds.clear();
 
     if (toBeLockedTabs.length > 0)
-      browser.runtime.sendMessage(TST_ID, {
+      callTSTAPI({
         type:  'add-tab-state',
         tabs:  toBeLockedTabs,
         state: [KEY_LOCKED_COLLAPSED]
       });
     if (toBeUnlockedTabs.length > 0)
-      browser.runtime.sendMessage(TST_ID, {
+      callTSTAPI({
         type:  'remove-tab-state',
         tabs:  toBeUnlockedTabs,
         state: [KEY_LOCKED_COLLAPSED]
