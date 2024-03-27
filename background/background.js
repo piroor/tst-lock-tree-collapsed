@@ -438,19 +438,35 @@ browser.tabs.onRemoved.addListener(tabId => {
 
 async function tryProcessChildAttachedInLockedCollapsedTree({ child, parent }) {
   log('tryProcessChildAttachedInLockedCollapsedTree ', { child, parent });
-  if (child && !child.states.includes('creating')) {
-    log('  not creating tab: ignore');
+  if (!child) {
+    log('  missing tab: ignore');
     return;
   }
 
   const wasActive = (await browser.tabs.get(child.id)).active;
 
-  const resolvers = mWaitingProcessedTabsResolvers.get(child.id) || [];
+  try {
+    const alreadyCheckedId = await browser.sessions.getTabValue(child.id, 'tryProcessChildAttachedInLockedCollapsedTreeProcessedId');
+    if (alreadyCheckedId == child.id) {
+      log('  already checked');
+      return;
+    }
+  }
+  catch(error) {
+    log('  failed to get last state ', error);
+  }
+
+  browser.sessions.setTabValue(child.id, 'tryProcessChildAttachedInLockedCollapsedTreeProcessedId', child.id);
+
+  if (child.states.includes('creating')) {
+    log('  creating tab');
+  const resolvers = mWaitingProcessedTabsResolvers.get(child.id) || new Set();
   const promisedProcessed = new Promise((resolve, _reject) => {
-    resolvers.push(resolve);
+    resolvers.add(resolve);
     mWaitingProcessedTabsResolvers.set(child.id, resolvers);
   });
   await promisedProcessed;
+  }
 
   // wait until tab move by TST finishes
   await wait(configs.redirectChildNotFromExistingTabsUnderLockedCollapsedTreeDelayMsec);
