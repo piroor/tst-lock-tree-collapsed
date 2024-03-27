@@ -460,12 +460,12 @@ async function tryProcessChildAttachedInLockedCollapsedTree({ child, parent }) {
 
   if (child.states.includes('creating')) {
     log('  creating tab');
-  const resolvers = mWaitingProcessedTabsResolvers.get(child.id) || new Set();
-  const promisedProcessed = new Promise((resolve, _reject) => {
-    resolvers.add(resolve);
-    mWaitingProcessedTabsResolvers.set(child.id, resolvers);
-  });
-  await promisedProcessed;
+    const resolvers = mWaitingProcessedTabsResolvers.get(child.id) || new Set();
+    const promisedProcessed = new Promise((resolve, _reject) => {
+      resolvers.add(resolve);
+      mWaitingProcessedTabsResolvers.set(child.id, resolvers);
+    });
+    await promisedProcessed;
   }
 
   // wait until tab move by TST finishes
