@@ -438,8 +438,10 @@ browser.tabs.onRemoved.addListener(tabId => {
 
 async function tryProcessChildAttachedInLockedCollapsedTree({ child, parent }) {
   log('tryProcessChildAttachedInLockedCollapsedTree ', { child, parent });
-  if (child && !child.states.includes('creating'))
+  if (child && !child.states.includes('creating')) {
+    log('  not creating tab: ignore');
     return;
+  }
 
   const wasActive = (await browser.tabs.get(child.id)).active;
 
@@ -463,8 +465,10 @@ async function tryProcessChildAttachedInLockedCollapsedTree({ child, parent }) {
         childStates.has('restored') ||
         childStates.has('from-external') ||
         childStates.has('from-firefox-view') ||
-        childStates.has('opened-for-same-website')))
+        childStates.has('opened-for-same-website'))) {
+    log('  not a tab to be redirected: ignore');
     return;
+  }
 
   switch (configs.redirectChildNotFromExistingTabsUnderLockedCollapsedTree) {
     case 'none':
