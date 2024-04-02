@@ -1,6 +1,8 @@
 # History
 
  - master/HEAD
+ - 1.4.3 (2024.4.3)
+   * Redirect tabs more certainly as configured, when new child tabs are attached to locked collapsed tree.
  - 1.4.2 (2024.3.26)
    * Add a new option to redirect new child tabs attached to locked collapsed tree to top level tabs.
    * Add support for "Tabs Sidebar" of Watefox G6.0.10 and later.
