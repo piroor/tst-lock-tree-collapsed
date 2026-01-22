@@ -8,25 +8,25 @@
 import Configs from '/extlib/Configs.js';
 
 export const configs = new Configs({
-  context_lockCollapsed: true,
-  context_expandExceptLocked: false,
+  context_lockCollapsed:         true,
+  context_expandExceptLocked:    false,
   context_expandAllExceptLocked: false,
 
-  toggleByDblClick: true,
-  lockByDefault: false,
-  blockExpansionFromFocusedParent:        true,
-  blockExpansionFromFocusedBundledParent: true,
-  blockExpansionFromAttachedChild:        true,
-  redirectChildNotFromExistingTabsUnderLockedCollapsedTree: 'none',
+  toggleByDblClick:                                                  true,
+  lockByDefault:                                                     false,
+  blockExpansionFromFocusedParent:                                   true,
+  blockExpansionFromFocusedBundledParent:                            true,
+  blockExpansionFromAttachedChild:                                   true,
+  redirectChildNotFromExistingTabsUnderLockedCollapsedTree:          'none',
   redirectChildNotFromExistingTabsUnderLockedCollapsedTreeDelayMsec: 100,
-  blockExpansionFromLongPressCtrlKey:     true,
-  blockExpansionFromEndTabSwitch:         true,
-  blockExpansionFromFocusedCollapsedTab:  true,
-  blockExpansionFromExpandCommand:        false,
-  blockExpansionFromExpandAllCommand:     false,
-  blockCollapsionFromOtherExpansion:      false,
-  blockCollapsionFromCollapseCommand:     false,
-  blockCollapsionFromCollapseAllCommand:  false,
+  blockExpansionFromLongPressCtrlKey:                                true,
+  blockExpansionFromEndTabSwitch:                                    true,
+  blockExpansionFromFocusedCollapsedTab:                             true,
+  blockExpansionFromExpandCommand:                                   false,
+  blockExpansionFromExpandAllCommand:                                false,
+  blockCollapsionFromOtherExpansion:                                 false,
+  blockCollapsionFromCollapseCommand:                                false,
+  blockCollapsionFromCollapseAllCommand:                             false,
 
   TSTID: null,
 
@@ -57,8 +57,7 @@ export function nextFrame() {
   });
 }
 
-export function log(...args)
-{
+export function log(...args) {
   if (!configs.debug)
     return;
 

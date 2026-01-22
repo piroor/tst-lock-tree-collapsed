@@ -85,13 +85,13 @@ async function registerToTST() {
     const [TSTVersion] = await Promise.all([
       getTSTVersion(),
       callTSTAPI({
-        type: 'register-self',
-        name: browser.i18n.getMessage('extensionName'),
+        type:               'register-self',
+        name:               browser.i18n.getMessage('extensionName'),
         //icons: browser.runtime.getManifest().icons,
         listeningTypes,
         allowBulkMessaging: true,
-        lightTree: true,
-        style: `
+        lightTree:          true,
+        style:              `
           tab-item:not(.collapsed).${KEY_LOCKED_COLLAPSED} tab-twisty::before {
             background: url("${base}/resources/ArrowheadDownDouble.svg") no-repeat center / 60%;
           }
@@ -539,9 +539,9 @@ async function tryProcessChildAttachedInLockedCollapsedTree({ child, parent }) {
           continue;
         if (ancestor.ancestorTabIds[0]) {
           await callTSTAPI({
-            type: 'attach',
-            parent: ancestor.ancestorTabIds[0],
-            child:  child.id,
+            type:         'attach',
+            parent:       ancestor.ancestorTabIds[0],
+            child:        child.id,
             insertBefore: nextSibling?.id,
           });
         }
@@ -667,8 +667,8 @@ async function onMenuShown(info, tab) {
   const treeItems = await appendTreeInfo(multiselectedTabs);
   const treeItemForTab = treeItems.find(treeItem => treeItem.id == tab.id);
   const shouldEnable = {
-    lockCollapsed: (treeItemForTab && treeItemForTab.children.length > 0),
-    expandExceptLocked: treeItems.some(treeItem => treeItem.children.length > 0),
+    lockCollapsed:         (treeItemForTab && treeItemForTab.children.length > 0),
+    expandExceptLocked:    treeItems.some(treeItem => treeItem.children.length > 0),
     expandAllExceptLocked: true,
   };
 
@@ -706,7 +706,7 @@ browser.menus.onShown.addListener(onMenuShown);
 async function onMenuClicked(info, tab) {
   if (!tab)
     return;
-  switch(info.menuItemId) {
+  switch (info.menuItemId) {
     case menuItemDefinitions.lockCollapsed.id:
       toggleCollapsed(tab, await getMultiselectedTabs(tab));
       break;
